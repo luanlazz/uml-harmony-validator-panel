@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: UML Model Inconsistencies Plugin
+Bundle-SymbolicName: com.continuous.inconsistency;singleton:=true
+Bundle-Vendor: Luan Lazzari
+Bundle-Version: 1.0.0.qualifier
+Import-Package: com.google.gson
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ com.google.gson
+Automatic-Module-Name: continuous.inconsistency
+Bundle-ClassPath: icons/,
+ .
+Bundle-RequiredExecutionEnvironment: JavaSE-17
