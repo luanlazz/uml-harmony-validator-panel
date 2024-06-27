@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="com.inconsistency.category.uml.inconsistency"
+            class="com.inconsistency.InconsistencyPanel"
+            id="com.inconsistency.InconsistencyAnalyser"
+            name="Inconsistency Analyser"
+            restorable="true">
+      </view>
+      <category
+            id="com.inconsistency.category.uml.inconsistency"
+            name="Inconsistency Panel">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.inconsistency.handlers.AnalyseInconsistenciesHandler"
+            commandId="com.inconsistency.handlers.AnalyseInconsistenciesHandler">
+      </handler>
+      <handler
+            class="com.inconsistency.handlers.GetInconsistenciesHandler"
+            commandId="com.inconsistency.handlers.GetInconsistenciesHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.inconsistency.handlers.AnalyseInconsistenciesHandler"
+            description="Analyse the inconsistencies of your model"
+            id="com.inconsistency.handlers.analyseinconsistenciescommand"
+            name="Analyse Model">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:com.inconsistency.InconsistencyAnalyser">
+         <command
+               commandId="com.inconsistency.handlers.analyseinconsistenciescommand"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:com.inconsistency.InconsistencyAnalyser">
+         <command
+               commandId="com.inconsistency.handlers.analyseinconsistenciescommand"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>
