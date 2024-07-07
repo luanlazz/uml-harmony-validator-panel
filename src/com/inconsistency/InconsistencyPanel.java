@@ -132,16 +132,18 @@ public class InconsistencyPanel extends ViewPart {
 		this.summary = new Label(row, PROP_TITLE);
 		this.summary.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		FontData[] fD = this.summary.getFont().getFontData();
-		fD[0].setHeight(16);
+		fD[0].setHeight(20);
 		this.summary.setFont(new Font(display, fD[0]));
 		this.updateSummary(null, 0);
+//		this.summary.setText("Analyze your model to see if it is consistent!");
+		this.summary.setText("Analise seu modelo para verificar se é consistente!");
 
 		// summary inconsistencies
 		Composite col2 = new Composite(row, SWT.NONE);
 		col2.setLayout(new GridLayout(3, true));
 		col2.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
 
-		fD[0].setHeight(14);
+		fD[0].setHeight(18);
 
 		this.highInconsistencies = new CLabel(col2, PROP_TITLE);
 		this.highInconsistencies.setFont(new Font(display, fD[0]));
@@ -193,16 +195,17 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void updateTotalInconsistencies(int num) {
-		this.labelTotalInconsistencies.setText(String.format("Total inconsistencies: %d", num));
+//		this.labelTotalInconsistencies.setText(String.format("Total inconsistencies: %d", num));
+		this.labelTotalInconsistencies.setText(String.format("Total de inconsistencias: %d", num));
 	}
 
 	public void updateSummary(String model, int num) {
 		if (model != null && num > 0) {
-			this.summary.setText(String.format("Model %s has %d inconsistencies.", model, num));
-		} else if (model != null && num == 0) {
-			this.summary.setText("Your model is consistent!");
+//			this.summary.setText(String.format("Model %s has %d inconsistencies.", model, num));
+			this.summary.setText(String.format("O modelo %s contém %d inconsistencias.", model, num));
 		} else {
-			this.summary.setText("Analyse your model to check if is consistent!");
+//			this.summary.setText("Your model is consistent!");
+			this.summary.setText("O modelo é consistente!");
 		}
 
 		this.summary.pack();
@@ -219,7 +222,8 @@ public class InconsistencyPanel extends ViewPart {
 
 	public void updateHighInconsistencies(long num) {
 //		if (num > 0) {
-		this.highInconsistencies.setText("High: " + num);
+//		this.highInconsistencies.setText("High: " + num);
+		this.highInconsistencies.setText("Alta: " + num);
 		if (this.imgHighWarning != null) {
 			this.highInconsistencies.setImage(this.imgHighWarning);
 		}
@@ -233,7 +237,8 @@ public class InconsistencyPanel extends ViewPart {
 
 	public void updateMediumInconsistencies(long num) {
 //		if (num > 0) {
-		this.mediumInconsistencies.setText("Medium: " + num);
+//		this.mediumInconsistencies.setText("Medium: " + num);
+		this.mediumInconsistencies.setText("Média: " + num);
 		if (this.imgMediumWarning != null) {
 			this.mediumInconsistencies.setImage(this.imgMediumWarning);
 		}
@@ -247,7 +252,8 @@ public class InconsistencyPanel extends ViewPart {
 
 	public void updateLowInconsistencies(long num) {
 //		if (num > 0) {
-		this.lowInconsistencies.setText("Low: " + num);
+//		this.lowInconsistencies.setText("Low: " + num);
+		this.lowInconsistencies.setText("Baixa: " + num);
 		if (this.imgLowWarning != null) {
 			this.lowInconsistencies.setImage(this.imgLowWarning);
 		}

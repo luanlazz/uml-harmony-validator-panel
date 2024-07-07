@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -46,9 +48,14 @@ public class InconsistenciesTable {
 		table.setLayoutData(gridTable);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
-
+		
+		FontData[] fD = table.getFont().getFontData();
+		fD[0].setHeight(16);
+		table.setFont(new Font(table.getDisplay(), fD[0]));
+		
 		// table header
-		String[] titles = { "Severity", "Diagram", "Inconsistency", "Context", "Consistency Rule" };
+//		String[] titles = { "Severity", "Diagram", "Inconsistency", "Context", "Consistency Rule" };
+		String[] titles = { "Gravidade", "Contexto", "Inconsistencia", "Descrição", "Regra(s) de consistência" };
 
 		for (int i = 0; i < titles.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
@@ -56,7 +63,7 @@ public class InconsistenciesTable {
 			column.pack();
 //			column.setImage(images[i]);
 			if (i == 3) {
-				column.setWidth(500);
+				column.setWidth(700);
 			}
 		}
 
@@ -74,20 +81,24 @@ public class InconsistenciesTable {
 		this.clearInconsistenciesTable();
 
 		for (InconsistencyErrorDTO inconsistency : inconsistencies) {
-			TableItem TItem = new TableItem(table, SWT.NONE);
-			TItem.setData(inconsistencies);
+			TableItem tItem = new TableItem(table, SWT.NONE);
+			FontData[] fD = tItem.getFont().getFontData();
+			fD[0].setHeight(16);
+			tItem.setFont(new Font(table.getDisplay(), fD[0]));
+			
+			tItem.setData(inconsistencies);
 
 			int i = 0;
 //			TItem.setText(i, inconsistency.getSeverityLabel() != null ? inconsistency.getSeverityLabel() : "");
 			Color bgItem = colorBySeverity.get(
 					inconsistency.getSeverity() > 0 && inconsistency.getSeverity() <= 3 ? inconsistency.getSeverity()
 							: 1);
-			TItem.setBackground(i++, bgItem);
-			TItem.setText(i++, inconsistency.getDiagram() != null ? inconsistency.getDiagram() : "");
-			TItem.setText(i++,
+			tItem.setBackground(i++, bgItem);
+			tItem.setText(i++, inconsistency.getDiagram() != null ? inconsistency.getDiagram() : "");
+			tItem.setText(i++,
 					inconsistency.getInconsistencyTypeCode() != null ? inconsistency.getInconsistencyTypeCode() : "");
-			TItem.setText(i++, inconsistency.getDescription() != null ? inconsistency.getDescription() : "");
-			TItem.setText(i++, inconsistency.getCr() != null ? inconsistency.getCr() : "-");
+			tItem.setText(i++, inconsistency.getDescription() != null ? inconsistency.getDescription() : "");
+			tItem.setText(i++, inconsistency.getCr() != null ? inconsistency.getCr() : "-");
 		}
 	}
 }
