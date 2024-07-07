@@ -2,7 +2,6 @@ package com.inconsistency.services;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -92,8 +91,6 @@ public class InconsistencyAnalyserAPI {
 		HttpURLConnection connection = null;
 
 		try {
-//			System.out.println("------------------------ GET ------------------------");
-
 			String urlWithClient = this.urlBase + "/inconsistencies/" + clientId;
 			URL url = new URL(urlWithClient);
 			connection = (HttpURLConnection) url.openConnection();
@@ -117,10 +114,11 @@ public class InconsistencyAnalyserAPI {
 				sb.append(strCurrentLine);
 			}
 
-//			System.out.println("Response Code: " + responseCode);
-//			System.out.println("Response Body: " + sb.toString());
-
-			return Json2Obj.deserializeCollection(sb.toString(), InconsistencyErrorDTO.class);
+			List<InconsistencyErrorDTO> list = Json2Obj.deserializeCollection(sb.toString(),
+					InconsistencyErrorDTO.class);
+			if (list != null) {
+				response = list;
+			}
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		} finally {

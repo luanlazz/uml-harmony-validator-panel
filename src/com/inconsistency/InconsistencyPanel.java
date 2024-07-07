@@ -50,11 +50,6 @@ public class InconsistencyPanel extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-//		MenuManager menuManager = new MenuManager();
-//		Menu contextMenu = menuManager.createContextMenu(parent);
-//		getSite().registerContextMenu(menuManager, null);
-//		parent.setMenu(contextMenu);
-
 		GridLayout layout = new GridLayout(1, false);
 		parent.setLayout(layout);
 		Display display = parent.getDisplay();
@@ -62,71 +57,6 @@ public class InconsistencyPanel extends ViewPart {
 		Composite row = new Composite(parent, SWT.NONE);
 		row.setLayout(new GridLayout(2, true));
 		row.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-//		Button button = new Button(row1, SWT.PUSH);
-//		button.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-//		button.setText("Analyse UML Model");
-//		button.addListener(SWT.Selection, new Listener() {
-//			@Override
-//			public void handleEvent(Event event) {
-//				try {
-//					statusAnalyse.setText("Analysing...");
-//					statusAnalyse.update();
-//
-//					AnalyserResponseDTO analyseResponse = (AnalyserResponseDTO) analyseModelHandler.execute(null);
-//
-//					List<InconsistencyErrorDTO> inconsistencies = new ArrayList<>();
-//
-//					if (analyseResponse.getSuccess()) {
-//						statusAnalyse.setText("Fetching result...");
-//						statusAnalyse.update();
-//
-//						Thread.sleep(1000);
-//
-//						HashMap<String, String> parameters = new HashMap<String, String>();
-//						parameters.put("clientId", analyseResponse.getClientId());
-//
-//						ExecutionEvent executionEvent = new ExecutionEvent(null, parameters, null, null);
-//
-//						inconsistencies = (List<InconsistencyErrorDTO>) getInconsistenciesHandler
-//								.execute(executionEvent);
-//					}
-//
-//					String modelName = null;
-//					if (inconsistencies.size() > 0) {
-//						inconsistenciesTable.fillInconsistencies(inconsistencies);
-//						updateTotalInconsistencies(inconsistencies.size());
-//
-//						modelName = inconsistencies.get(0).getUmlPackage();
-//					} else {
-//						inconsistenciesTable.clearInconsistenciesTable();
-//						updateTotalInconsistencies(0);
-//					}
-//					updateSummary(modelName, inconsistencies.size());
-//
-//					updateHighInconsistencies(countInconsistenciesBySeverity(inconsistencies, "HIGH"));
-//					updateMediumInconsistencies(countInconsistenciesBySeverity(inconsistencies, "MEDIUM"));
-//					updateLowInconsistencies(countInconsistenciesBySeverity(inconsistencies, "LOW"));
-//
-//					if (!analyseResponse.getSuccess()) {
-//						throw new Exception();
-//					}
-//
-//					statusAnalyse.setText("Check the result!");
-//				} catch (Exception e) {
-//					System.out.println(e.getMessage());
-//					String errorMsg = e.getMessage() != null ? e.getMessage() : "Error when analyse the model.";
-//					statusAnalyse.setText(errorMsg);
-//				} finally {
-//					statusAnalyse.update();
-//					statusAnalyse.pack();
-//				}
-//			}
-//		});
-//
-//		statusAnalyse = new Label(row1, PROP_TITLE);
-//		statusAnalyse.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-//		statusAnalyse.pack();
 
 		// summary
 		this.summary = new Label(row, PROP_TITLE);
@@ -169,6 +99,11 @@ public class InconsistencyPanel extends ViewPart {
 		this.updateTotalInconsistencies(0);
 	}
 
+	public void clearTable() {
+		inconsistenciesTable.clearInconsistenciesTable();
+		updateTotalInconsistencies(0);
+	}
+
 	public void updateViewData(List<InconsistencyErrorDTO> inconsistencies) {
 		String modelName = null;
 		if (inconsistencies.size() > 0) {
@@ -176,10 +111,8 @@ public class InconsistencyPanel extends ViewPart {
 			updateTotalInconsistencies(inconsistencies.size());
 
 			modelName = inconsistencies.get(0).getUmlPackage();
-		} else {
-			inconsistenciesTable.clearInconsistenciesTable();
-			updateTotalInconsistencies(0);
 		}
+
 		updateSummary(modelName, inconsistencies.size());
 
 		updateHighInconsistencies(countInconsistenciesBySeverity(inconsistencies, Severity.HIGH));

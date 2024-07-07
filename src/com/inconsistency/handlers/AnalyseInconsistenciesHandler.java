@@ -30,16 +30,18 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) {
-		List<InconsistencyErrorDTO> inconsistencies = new ArrayList();
+		List<InconsistencyErrorDTO> inconsistencies = new ArrayList<InconsistencyErrorDTO>();
 
 		try {
+			InconsistencyPanel.instace().clearTable();
+			
 			AnalyserResponseDTO analyseResponse = analyseActiveEditor();
-
+						
 			if (analyseResponse.getSuccess()) {
 				Thread.sleep(1000);
 
 				inconsistencies = fecthInconsistenciesByClientId(analyseResponse.getClientId());
-
+				
 				InconsistencyPanel.instace().updateViewData(inconsistencies);
 			}
 		} catch (Exception e) {
