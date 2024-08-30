@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: UML Model Inconsistencies Plugin
-Bundle-SymbolicName: com.continuous.inconsistency;singleton:=true
+Bundle-Name: UML Harmony Validator
+Bundle-SymbolicName: UMLHarmonyValidatorPanel;singleton:=true
 Bundle-Vendor: Luan Lazzari
 Bundle-Version: 1.0.0.qualifier
 Import-Package: com.google.gson

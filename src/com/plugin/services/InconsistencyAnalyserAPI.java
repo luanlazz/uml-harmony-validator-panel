@@ -1,4 +1,4 @@
-package com.inconsistency.services;
+package com.plugin.services;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,14 +9,12 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 
-import com.inconsistency.dto.AnalyserResponseDTO;
-import com.inconsistency.dto.InconsistencyErrorDTO;
-import com.inconsistency.utils.Json2Obj;
+import com.plugin.services.dto.AnalyserResponseDTO;
+import com.plugin.services.dto.InconsistenciesResponseDTO;
+import com.plugin.utils.Json2Obj;
 
 public class InconsistencyAnalyserAPI {
 
@@ -76,7 +74,7 @@ public class InconsistencyAnalyserAPI {
 
 			return Json2Obj.deserializeObj(sb.toString(), AnalyserResponseDTO.class);
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println("analyseFile exception" + e.toString());
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
@@ -86,8 +84,7 @@ public class InconsistencyAnalyserAPI {
 		return new AnalyserResponseDTO();
 	}
 
-	public List<InconsistencyErrorDTO> getInconsistenciesByClientId(String clientId) {
-		List<InconsistencyErrorDTO> response = new ArrayList<>();
+	public InconsistenciesResponseDTO getInconsistenciesByClientId(String clientId) {
 		HttpURLConnection connection = null;
 
 		try {
@@ -114,19 +111,15 @@ public class InconsistencyAnalyserAPI {
 				sb.append(strCurrentLine);
 			}
 
-			List<InconsistencyErrorDTO> list = Json2Obj.deserializeCollection(sb.toString(),
-					InconsistencyErrorDTO.class);
-			if (list != null) {
-				response = list;
-			}
+			return Json2Obj.deserializeObj(sb.toString(), InconsistenciesResponseDTO.class);
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println("getInconsistenciesByClientId exception:" + e.toString());
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
 			}
 		}
 
-		return response;
+		return new InconsistenciesResponseDTO();
 	}
 }

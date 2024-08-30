@@ -1,4 +1,4 @@
-package com.inconsistency.dto;
+package com.plugin.services.dto;
 
 import java.util.HashMap;
 import java.util.Map;

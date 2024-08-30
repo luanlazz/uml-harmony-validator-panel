@@ -1,4 +1,4 @@
-package com.inconsistency.handlers;
+package com.plugin.handlers;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -9,14 +9,16 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
-import com.inconsistency.InconsistencyPanel;
-import com.inconsistency.dto.AnalyserResponseDTO;
-import com.inconsistency.dto.InconsistencyErrorDTO;
-import com.inconsistency.services.InconsistencyAnalyserAPI;
+import com.plugin.InconsistencyPanel;
+import com.plugin.services.InconsistencyAnalyserAPI;
+import com.plugin.services.InconsistencyFetchAPI;
+import com.plugin.services.dto.AnalyserResponseDTO;
+import com.plugin.services.dto.InconsistencyErrorDTO;
 
 public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
@@ -25,7 +27,6 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -33,19 +34,20 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		List<InconsistencyErrorDTO> inconsistencies = new ArrayList<InconsistencyErrorDTO>();
 
 		try {
-			InconsistencyPanel.instace().clearTable();
-			
-			AnalyserResponseDTO analyseResponse = analyseActiveEditor();
-						
-			if (analyseResponse.getSuccess()) {
-				Thread.sleep(1000);
+			InconsistencyPanel.instace().clearTables();
 
-				inconsistencies = fecthInconsistenciesByClientId(analyseResponse.getClientId());
-				
-				InconsistencyPanel.instace().updateViewData(inconsistencies);
+			AnalyserResponseDTO analyseResponse = analyseActiveEditor();
+
+			if (analyseResponse.getSuccess()) {
+				int maxRetries = 12;
+				long retryDelayInMS = 100; // 100 ms
+
+				InconsistencyFetchAPI fetchAPI = new InconsistencyFetchAPI(analyseResponse.getClientId(), maxRetries,
+						retryDelayInMS);
+				Display.getDefault().asyncExec(fetchAPI);
 			}
 		} catch (Exception e) {
-			System.out.println("Error analyse model: " + e.getMessage());
+			System.out.println("AnalyseInconsistenciesHandler exception: " + e.getMessage());
 		}
 
 		return inconsistencies;
@@ -71,11 +73,5 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		}
 
 		return analyseResponse;
-	}
-
-	private List<InconsistencyErrorDTO> fecthInconsistenciesByClientId(String clientId) throws Exception {
-		List<InconsistencyErrorDTO> response = analyserService.getInconsistenciesByClientId(clientId);
-
-		return response;
 	}
 }

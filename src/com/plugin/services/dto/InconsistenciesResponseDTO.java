@@ -1,9 +1,9 @@
-package com.inconsistency.dto;
+package com.plugin.services.dto;
 
-public class AnalyserResponseDTO {
+public class InconsistenciesResponseDTO {
 
 	private Boolean success;
-	private String clientId;
+	private InconsistenciesResponse data;
 	private String error;
 
 	public Boolean getSuccess() {
@@ -14,12 +14,12 @@ public class AnalyserResponseDTO {
 		this.success = success;
 	}
 
-	public String getClientId() {
-		return clientId;
+	public InconsistenciesResponse getData() {
+		return data;
 	}
 
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
+	public void setData(InconsistenciesResponse data) {
+		this.data = data;
 	}
 
 	public String getError() {
@@ -29,6 +29,4 @@ public class AnalyserResponseDTO {
 	public void setError(String error) {
 		this.error = error;
 	}
-
-
 }

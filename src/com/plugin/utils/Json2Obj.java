@@ -1,4 +1,4 @@
-package com.inconsistency.utils;
+package com.plugin.utils;
 
 import java.lang.reflect.Type;
 import java.util.List;
