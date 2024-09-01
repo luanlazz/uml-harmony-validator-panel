@@ -18,10 +18,24 @@ import com.plugin.utils.Json2Obj;
 
 public class InconsistencyAnalyserAPI {
 
-	private final String urlBase = "http://localhost:8080/kafka";
+	public static String URL_BASE = "";
+
+	public InconsistencyAnalyserAPI() {
+		getUrl();
+	}
+
+	public static void setUrlBase(String url) {
+		AppPreferences.put("base_rul", url);
+		URL_BASE = url;
+	}
+
+	public static String getUrl() {
+		URL_BASE = AppPreferences.get("base_rul");
+		return URL_BASE;
+	}
 
 	public AnalyserResponseDTO analyseFile(IFile iFile) {
-		String url = urlBase + "/send";
+		String url = URL_BASE + "/send";
 		String charset = "UTF-8";
 		String param = "/send";
 		File textFile = iFile.getRawLocation().makeAbsolute().toFile();
@@ -88,7 +102,7 @@ public class InconsistencyAnalyserAPI {
 		HttpURLConnection connection = null;
 
 		try {
-			String urlWithClient = this.urlBase + "/inconsistencies/" + clientId;
+			String urlWithClient = this.URL_BASE + "/inconsistencies/" + clientId;
 			URL url = new URL(urlWithClient);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");

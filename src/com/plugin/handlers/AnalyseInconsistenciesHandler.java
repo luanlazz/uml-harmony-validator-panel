@@ -14,11 +14,11 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
-import com.plugin.InconsistencyPanel;
 import com.plugin.services.InconsistencyAnalyserAPI;
 import com.plugin.services.InconsistencyFetchAPI;
 import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistencyErrorDTO;
+import com.plugin.views.InconsistencyPanel;
 
 public class AnalyseInconsistenciesHandler extends AbstractHandler {
 

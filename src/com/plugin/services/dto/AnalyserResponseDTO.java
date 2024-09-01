@@ -2,7 +2,7 @@ package com.plugin.services.dto;
 
 public class AnalyserResponseDTO {
 
-	private Boolean success;
+	private Boolean success = false;
 	private String clientId;
 	private String error;
 

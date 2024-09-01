@@ -1,7 +1,7 @@
 package com.plugin.services;
 
-import com.plugin.InconsistencyPanel;
 import com.plugin.services.dto.InconsistenciesResponseDTO;
+import com.plugin.views.InconsistencyPanel;
 
 public class InconsistencyFetchAPI implements Runnable {
 

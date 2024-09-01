@@ -16,10 +16,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import com.plugin.InconsistencyPanel;
 import com.plugin.services.dto.DiagramStatisticsDTO;
 import com.plugin.services.dto.InconsistencyConcentrationDTO;
 import com.plugin.services.dto.Severity;
+import com.plugin.views.InconsistencyPanel;
 
 public class DiagramsConcentrationTable {
 

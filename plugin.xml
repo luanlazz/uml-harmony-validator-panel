@@ -5,7 +5,7 @@
          point="org.eclipse.ui.views">
       <view
             category="com.inconsistency.category.uml.inconsistency"
-            class="com.plugin.InconsistencyPanel"
+            class="com.plugin.views.InconsistencyPanel"
             id="com.inconsistency.InconsistencyAnalyser"
             name="UML Harmony Validator Panel"
             restorable="true">
@@ -22,8 +22,8 @@
             commandId="com.inconsistency.handlers.AnalyseInconsistenciesHandler">
       </handler>
       <handler
-            class="com.plugin.handlers.GetInconsistenciesHandler"
-            commandId="com.inconsistency.handlers.GetInconsistenciesHandler">
+            class="com.plugin.handlers.SettingsHandler"
+            commandId="com.inconsistency.handlers.SettingsHandler">
       </handler>
    </extension>
    <extension
@@ -33,6 +33,12 @@
             description="Analyse the inconsistencies of your model"
             id="com.inconsistency.handlers.analyseinconsistenciescommand"
             name="Analyse Model">
+      </command>
+      <command
+            defaultHandler="com.plugin.handlers.SettingsHandler"
+            description="Settings"
+            id="com.inconsistency.handlers.settingscommand"
+            name="Settings">
       </command>
    </extension>
    <extension
@@ -50,6 +56,10 @@
             locationURI="menu:com.inconsistency.InconsistencyAnalyser">
          <command
                commandId="com.inconsistency.handlers.analyseinconsistenciescommand"
+               style="push">
+         </command>
+         <command
+               commandId="com.inconsistency.handlers.settingscommand"
                style="push">
          </command>
       </menuContribution>

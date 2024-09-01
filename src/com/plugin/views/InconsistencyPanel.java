@@ -1,4 +1,4 @@
-package com.plugin;
+package com.plugin.views;
 
 import java.io.IOException;
 import java.io.InputStream;
