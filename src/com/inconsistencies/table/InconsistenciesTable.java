@@ -43,8 +43,8 @@ public class InconsistenciesTable {
 
 	public void initializeTable(Composite parent, int cols) {
 		setTable(new Table(parent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION));
-		GridData gridTable = new GridData(SWT.FILL, SWT.FILL, true, true, cols, 2);
-		gridTable.heightHint = 200;
+		GridData gridTable = new GridData(SWT.FILL, SWT.FILL, true, true, cols, 1);
+		gridTable.heightHint = 130;
 		table.setLayoutData(gridTable);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -89,10 +89,12 @@ public class InconsistenciesTable {
 
 			int i = 0;
 			tItem.setText(i, inconsistency.getConcentrationStr() != null ? inconsistency.getConcentrationStr() : "-");
-			Color bgItem = colorBySeverity.get(
-					inconsistency.getSeverity() > 0 && inconsistency.getSeverity() <= 3 ? inconsistency.getSeverity()
-							: 1);
-			tItem.setBackground(i++, bgItem);
+			int severity = inconsistency.getSeverity();
+			Color bgItem = colorBySeverity.get(severity > 0 && severity <= 3 ? severity : 1);
+			tItem.setBackground(i, bgItem);
+			if (severity >= 2) tItem.setForeground(i, this.table.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			
+			i++;
 			tItem.setText(i++,
 					inconsistency.getInconsistencyTypeCode() != null ? inconsistency.getInconsistencyTypeCode() : "");
 			tItem.setText(i++, inconsistency.getDescription() != null ? inconsistency.getDescription() : "");

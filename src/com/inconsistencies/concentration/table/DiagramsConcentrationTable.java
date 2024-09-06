@@ -54,8 +54,8 @@ public class DiagramsConcentrationTable {
 
 	public void initializeTable(Composite parent, int cols) {
 		setTable(new Table(parent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION));
-		GridData gridTable = new GridData(SWT.FILL, SWT.FILL, true, true, cols, 2);
-		gridTable.heightHint = 200;
+		GridData gridTable = new GridData(SWT.FILL, SWT.FILL, true, true, cols, 1);
+		gridTable.heightHint = 130;
 		table.setLayoutData(gridTable);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -67,7 +67,7 @@ public class DiagramsConcentrationTable {
 		List<String> tHead = new ArrayList<String>();
 
 		if (type.equals("diagram")) {
-			tHead.addAll(Arrays.asList("Diagrama", "Inc.", "Conc.", "RMI (%)", "TEI (%)", "CI (%)"));
+			tHead.addAll(Arrays.asList("Diagrama", "Inc.", "Conc.(%)", "R.M.I. (%)", "T.E.I. (%)"));
 			
 			table.addListener(SWT.Selection, event -> {
 				TableItem item = (TableItem) event.item;
@@ -76,7 +76,7 @@ public class DiagramsConcentrationTable {
 				InconsistencyPanel.instace().filterElementsByDiagramId(concentration.getId());
 			});
 		} else {
-			tHead.addAll(Arrays.asList("Elemento", "Inc.", "Conc."));
+			tHead.addAll(Arrays.asList("Elemento", "Inc.", "Conc.(%)"));
 			
 			table.addListener(SWT.Selection, event -> {
 				TableItem item = (TableItem) event.item;
@@ -120,11 +120,12 @@ public class DiagramsConcentrationTable {
 							: "0");
 
 			tItem.setText(i, concentration.getConcentrationStr() != null ? concentration.getConcentrationStr() : "-");
-			Color bgItem = colorBySeverity.get(
-					concentration.getSeverity() > 0 && concentration.getSeverity() <= 3 ? concentration.getSeverity()
-							: 1);
-			tItem.setBackground(i++, bgItem);
+			int severity = concentration.getSeverity();
+			Color bgItem = colorBySeverity.get(severity > 0 && severity <= 3 ? severity : 1);
+			tItem.setBackground(i, bgItem);
+			if (severity >= 2) tItem.setForeground(i, this.table.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			
+			i++;
 			if (type.equals("diagram")) {
 				DiagramStatisticsDTO diagramStatistic = diagramStatistics.stream()
 						.filter(ds -> ds.getId().equals(concentration.getId())).findFirst().orElse(null);
@@ -132,7 +133,7 @@ public class DiagramsConcentrationTable {
 				if (diagramStatistic != null) {
 					tItem.setText(i++, diagramStatistic.getRiskMisinterpretationStr() != null ? diagramStatistic.getRiskMisinterpretationStr() : "");
 					tItem.setText(i++, diagramStatistic.getSpreadRateStr() != null ? diagramStatistic.getSpreadRateStr(): "");
-					tItem.setText(i++, diagramStatistic.getConcentrationIncStr() != null ? diagramStatistic.getConcentrationIncStr() : "");
+//					tItem.setText(i++, diagramStatistic.getConcentrationIncStr() != null ? diagramStatistic.getConcentrationIncStr() : "");
 				}
 			}
 		}
