@@ -53,7 +53,7 @@ public class InconsistenciesTable {
 		fD[0].setHeight(16);
 		table.setFont(new Font(table.getDisplay(), fD[0]));
 
-		String[] tHead = { "Conc.", "Inc.", "Descrição", "Regra consistência" };
+		String[] tHead = { "Conc.(%)", "Inc.", "Descrição", "Regra consistência" };
 
 		for (int i = 0; i < tHead.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);

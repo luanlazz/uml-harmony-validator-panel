@@ -82,7 +82,7 @@ public class InconsistencyErrorDTO {
 
 	public void setConcentration(double concentration) {
 		this.concentration = concentration;
-		this.setConcentrationStr(String.format("%.2f", concentration));
+		this.setConcentrationStr(String.format("%.1f", concentration));
 	}
 
 	public void calculateConcentration() {
@@ -126,12 +126,4 @@ public class InconsistencyErrorDTO {
 	public void setParentId(String diagramId) {
 		this.parentId = diagramId;
 	}
-
-//	public UMLModelDTO getModel() {
-//		return model;
-//	}
-//
-//	public void setModel(UMLModelDTO model) {
-//		this.model = model;
-//	}
 }

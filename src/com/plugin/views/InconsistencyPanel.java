@@ -69,7 +69,7 @@ public class InconsistencyPanel extends ViewPart {
 		FontData[] fD = this.summary.getFont().getFontData();
 		fD[0].setHeight(20);
 		this.summary.setFont(new Font(display, fD[0]));
-		this.summary.setText("Analise seu modelo para verificar se é consistente!");
+		this.summary.setText("Analise o modelo.");
 
 		// Cols span tables
 		int tDiagramsCols = 3;
@@ -188,14 +188,14 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void updateTotalInconsistencies(int num) {
-		this.labelTotalInconsistencies.setText(String.format("Total de inconsistencias: %d", num));
+		this.labelTotalInconsistencies.setText(String.format("Total de inconsistências: %d", num));
 	}
 
 	public void updateSummary(int num) {
 		if (num > 0) {
-			this.summary.setText(String.format("O modelo contém %d inconsistencias.", num));
+			this.summary.setText(String.format("Foram identificadas %d inconsistências no modelo.", num));
 		} else {
-			this.summary.setText("O modelo é consistente!");
+			this.summary.setText("O modelo está consistente!");
 		}
 
 		this.summary.pack();
