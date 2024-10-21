@@ -2,8 +2,8 @@ package com.plugin.services.dto;
 
 public class DiagramStatisticsDTO {
 
-private String id;
-	
+	private String id;
+
 	private double riskMisinterpretation = 0;
 	private String riskMisinterpretationStr;
 
@@ -12,6 +12,7 @@ private String id;
 
 	private double concentrationInc = 0;
 	private String concentrationIncStr;
+
 	public DiagramStatisticsDTO() {
 	}
 

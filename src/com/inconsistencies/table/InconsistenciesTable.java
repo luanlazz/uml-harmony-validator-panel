@@ -14,13 +14,20 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.plugin.i18n.MessageProvider;
 import com.plugin.services.dto.InconsistencyErrorDTO;
 import com.plugin.services.dto.Severity;
 
 public class InconsistenciesTable {
 
+	private MessageProvider messages;
+
 	private Table table = null;
 	private HashMap<Integer, Color> colorBySeverity = new HashMap<>();
+
+	public InconsistenciesTable() {
+		this.messages = MessageProvider.instace();
+	}
 
 	public Table getTable() {
 		return table;
@@ -53,7 +60,10 @@ public class InconsistenciesTable {
 		fD[0].setHeight(16);
 		table.setFont(new Font(table.getDisplay(), fD[0]));
 
-		String[] tHead = { "Conc.(%)", "Inc.", "Descrição", "Regra consistência" };
+		String[] tHead = { this.messages.get("table.inconsistency.head.concentration"),
+				this.messages.get("table.inconsistency.head.inconsistency"),
+				this.messages.get("table.inconsistency.head.description"),
+				this.messages.get("table.inconsistency.head.consistency.rule") };
 
 		for (int i = 0; i < tHead.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
@@ -92,8 +102,9 @@ public class InconsistenciesTable {
 			int severity = inconsistency.getSeverity();
 			Color bgItem = colorBySeverity.get(severity > 0 && severity <= 3 ? severity : 1);
 			tItem.setBackground(i, bgItem);
-			if (severity >= 2) tItem.setForeground(i, this.table.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			
+			if (severity >= 2)
+				tItem.setForeground(i, this.table.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
 			i++;
 			tItem.setText(i++,
 					inconsistency.getInconsistencyTypeCode() != null ? inconsistency.getInconsistencyTypeCode() : "");

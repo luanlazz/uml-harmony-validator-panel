@@ -17,12 +17,16 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.inconsistencies.concentration.table.DiagramsConcentrationTable;
 import com.inconsistencies.table.InconsistenciesTable;
+import com.plugin.i18n.MessageProvider;
+import com.plugin.services.InconsistencyAnalyserAPI;
 import com.plugin.services.dto.InconsistenciesResponse;
 import com.plugin.services.dto.InconsistencyConcentrationDTO;
 import com.plugin.services.dto.InconsistencyErrorDTO;
 import com.plugin.services.dto.Severity;
 
 public class InconsistencyPanel extends ViewPart {
+
+	private MessageProvider messages;
 
 	private static InconsistencyPanel single_instance = null;
 
@@ -45,6 +49,8 @@ public class InconsistencyPanel extends ViewPart {
 
 	public InconsistencyPanel() {
 		single_instance = this;
+
+		this.messages = MessageProvider.instace();
 	}
 
 	public static InconsistencyPanel instace() {
@@ -69,7 +75,7 @@ public class InconsistencyPanel extends ViewPart {
 		FontData[] fD = this.summary.getFont().getFontData();
 		fD[0].setHeight(20);
 		this.summary.setFont(new Font(display, fD[0]));
-		this.summary.setText("Analise o modelo.");
+		this.summary.setText(messages.get("summary.initial"));
 
 		// Cols span tables
 		int tDiagramsCols = 3;
@@ -81,21 +87,21 @@ public class InconsistencyPanel extends ViewPart {
 		this.labelDiagramsTable.setLayoutData(gridMisinterpretation);
 		fD[0].setHeight(16);
 		this.labelDiagramsTable.setFont(new Font(display, fD[0]));
-		this.labelDiagramsTable.setText("Diagramas");
+		this.labelDiagramsTable.setText(messages.get("table.diagrams.label"));
 
 		this.labelElementsTable = new Label(parent, PROP_TITLE);
 		GridData gridSpreadRate = new GridData(SWT.FILL, SWT.CENTER, true, false, tElementsCols, 1);
 		this.labelElementsTable.setLayoutData(gridSpreadRate);
 		fD[0].setHeight(16);
 		this.labelElementsTable.setFont(new Font(display, fD[0]));
-		this.labelElementsTable.setText("Elementos");
+		this.labelElementsTable.setText(messages.get("table.element.label"));
 
 		this.labelInconsistenciesTable = new Label(parent, PROP_TITLE);
 		GridData gridConcentrationInc = new GridData(SWT.FILL, SWT.CENTER, true, false, tInconsistenciesCols, 1);
 		this.labelInconsistenciesTable.setLayoutData(gridConcentrationInc);
 		fD[0].setHeight(16);
 		this.labelInconsistenciesTable.setFont(new Font(display, fD[0]));
-		this.labelInconsistenciesTable.setText("Inconsistências");
+		this.labelInconsistenciesTable.setText(messages.get("table.inconsistency.label"));
 
 		// Concentration diagrams
 		this.diagramConcentrationTable.initializeColors(parent);
@@ -145,8 +151,8 @@ public class InconsistencyPanel extends ViewPart {
 			List<InconsistencyConcentrationDTO> diagrams = data.getDiagrams();
 			diagramConcentrationTable.fillConcentrations(diagrams, data.getDiagramStatistics());
 			updateTotalPkgs(diagrams.size());
-			
-			String diagramId = diagrams.size()>0 ? diagrams.get(0).getId() : null;
+
+			String diagramId = diagrams.size() > 0 ? diagrams.get(0).getId() : null;
 			filterElementsByDiagramId(diagramId);
 		}
 
@@ -162,8 +168,8 @@ public class InconsistencyPanel extends ViewPart {
 
 		elementsConcentrationTable.fillConcentrations(elements, data.getDiagramStatistics());
 		updateTotalElements(elements.size());
-		
-		String elementId = elements.size()>0 ? elements.get(0).getId() : null;
+
+		String elementId = elements.size() > 0 ? elements.get(0).getId() : null;
 		filterInconsistenciesById(elementId);
 	}
 
@@ -180,22 +186,22 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void updateTotalPkgs(int num) {
-		this.labelTotalPkgs.setText(String.format("Total de diagramas: %d", num));
+		this.labelTotalPkgs.setText(String.format(messages.get("table.model.footer"), num));
 	}
 
 	public void updateTotalElements(int num) {
-		this.labelTotalElements.setText(String.format("Total de elementos: %d", num));
+		this.labelTotalElements.setText(String.format(messages.get("table.element.footer"), num));
 	}
 
 	public void updateTotalInconsistencies(int num) {
-		this.labelTotalInconsistencies.setText(String.format("Total de inconsistências: %d", num));
+		this.labelTotalInconsistencies.setText(String.format(messages.get("table.inconsistency.footer"), num));
 	}
 
 	public void updateSummary(int num) {
 		if (num > 0) {
-			this.summary.setText(String.format("Foram identificadas %d inconsistências no modelo.", num));
+			this.summary.setText(String.format(messages.get("summary.model.inconsistent"), num));
 		} else {
-			this.summary.setText("O modelo está consistente!");
+			this.summary.setText(messages.get("summary.model.consistent"));
 		}
 
 		this.summary.pack();

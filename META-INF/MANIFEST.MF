@@ -13,3 +13,4 @@ Automatic-Module-Name: continuous.inconsistency
 Bundle-ClassPath: icons/,
  .
 Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-Localization: OSGI-INF/l10n/bundle

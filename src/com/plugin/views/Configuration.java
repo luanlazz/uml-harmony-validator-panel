@@ -26,7 +26,7 @@ public class Configuration {
 
 		Shell dialog = new Shell(display, SWT.DIALOG_TRIM);
 		dialog.setSize(dialogWidth, dialogHeight);
-		dialog.setText("UML Harmony Validator Settings");
+		dialog.setText("UML Harmony Validator - Settings");
 
 		Label label = new Label(dialog, SWT.NONE | SWT.BORDER);
 		label.setText("Service URL");

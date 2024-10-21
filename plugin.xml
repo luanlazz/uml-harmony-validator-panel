@@ -6,6 +6,7 @@
       <view
             category="com.inconsistency.category.uml.inconsistency"
             class="com.plugin.views.InconsistencyPanel"
+            icon="icons/anomaly_blue.png"
             id="com.inconsistency.InconsistencyAnalyser"
             name="UML Harmony Validator Panel"
             restorable="true">
@@ -30,15 +31,13 @@
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="com.plugin.handlers.AnalyseInconsistenciesHandler"
-            description="Analyse the inconsistencies of your model"
             id="com.inconsistency.handlers.analyseinconsistenciescommand"
-            name="Analyse Model">
+            name="analyse">
       </command>
       <command
             defaultHandler="com.plugin.handlers.SettingsHandler"
-            description="Settings"
             id="com.inconsistency.handlers.settingscommand"
-            name="Settings">
+            name="settings">
       </command>
    </extension>
    <extension
@@ -48,7 +47,10 @@
             locationURI="toolbar:com.inconsistency.InconsistencyAnalyser">
          <command
                commandId="com.inconsistency.handlers.analyseinconsistenciescommand"
-               style="push">
+               icon="icons/detection.png"
+               label="%menu.command.analyse.name"
+               style="push"
+               tooltip="%menu.command.analyse.desc">
          </command>
       </menuContribution>
       <menuContribution
@@ -56,11 +58,17 @@
             locationURI="menu:com.inconsistency.InconsistencyAnalyser">
          <command
                commandId="com.inconsistency.handlers.analyseinconsistenciescommand"
-               style="push">
+               icon="icons/detection.png"
+               label="%menu.command.analyse.name"
+               style="push"
+               tooltip="%menu.command.analyse.name">
          </command>
          <command
                commandId="com.inconsistency.handlers.settingscommand"
-               style="push">
+               icon="icons/cogwheel.png"
+               label="%menu.command.settings.name"
+               style="push"
+               tooltip="%menu.command.settings.desc">
          </command>
       </menuContribution>
    </extension>

@@ -12,6 +12,7 @@ import java.nio.file.Files;
 
 import org.eclipse.core.resources.IFile;
 
+import com.plugin.i18n.MessageProvider;
 import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistenciesResponseDTO;
 import com.plugin.utils.Json2Obj;
@@ -19,9 +20,11 @@ import com.plugin.utils.Json2Obj;
 public class InconsistencyAnalyserAPI {
 
 	public static String URL_BASE = "";
+	private MessageProvider messages;
 
 	public InconsistencyAnalyserAPI() {
 		getUrl();
+		this.messages = MessageProvider.instace();
 	}
 
 	public static void setUrlBase(String url) {
@@ -47,6 +50,7 @@ public class InconsistencyAnalyserAPI {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+			connection.setRequestProperty("Accept-Language", this.messages.getLocale().toString());
 
 			OutputStream output = connection.getOutputStream();
 			PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
@@ -102,11 +106,12 @@ public class InconsistencyAnalyserAPI {
 		HttpURLConnection connection = null;
 
 		try {
-			String urlWithClient = this.URL_BASE + "/inconsistencies/" + clientId;
+			String urlWithClient = URL_BASE + "/inconsistencies/" + clientId;
 			URL url = new URL(urlWithClient);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept-Language", this.messages.getLocale().toString());
 			connection.setConnectTimeout(5000);
 			connection.setReadTimeout(5000);
 

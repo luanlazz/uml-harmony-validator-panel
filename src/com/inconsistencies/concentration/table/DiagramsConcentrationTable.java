@@ -16,12 +16,15 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.plugin.i18n.MessageProvider;
 import com.plugin.services.dto.DiagramStatisticsDTO;
 import com.plugin.services.dto.InconsistencyConcentrationDTO;
 import com.plugin.services.dto.Severity;
 import com.plugin.views.InconsistencyPanel;
 
 public class DiagramsConcentrationTable {
+
+	private MessageProvider messages;
 
 	private String type;
 	private Table table = null;
@@ -31,6 +34,7 @@ public class DiagramsConcentrationTable {
 
 	public DiagramsConcentrationTable(String type) {
 		this.type = type;
+		this.messages = MessageProvider.instace();
 	}
 
 	public Table getTable() {
@@ -67,8 +71,12 @@ public class DiagramsConcentrationTable {
 		List<String> tHead = new ArrayList<String>();
 
 		if (type.equals("diagram")) {
-			tHead.addAll(Arrays.asList("Diagrama", "Inc.", "Conc.(%)", "R.M.I. (%)", "T.E.I. (%)"));
-			
+			tHead.addAll(Arrays.asList(this.messages.get("table.diagram.head.diagram"),
+					this.messages.get("table.diagram.head.inconsistency.count"),
+					this.messages.get("table.diagram.head.concentration"),
+					this.messages.get("table.diagram.head.risk.misinterpretation"),
+					this.messages.get("table.diagram.head.inconsistency.spread.rate")));
+
 			table.addListener(SWT.Selection, event -> {
 				TableItem item = (TableItem) event.item;
 				int tableIndex = table.indexOf(item);
@@ -76,8 +84,10 @@ public class DiagramsConcentrationTable {
 				InconsistencyPanel.instace().filterElementsByDiagramId(concentration.getId());
 			});
 		} else {
-			tHead.addAll(Arrays.asList("Elemento", "Inc.", "Conc.(%)"));
-			
+			tHead.addAll(Arrays.asList(this.messages.get("table.element.head.element"),
+					this.messages.get("table.element.head.inconsistency.count"),
+					this.messages.get("table.element.head.concentration")));
+
 			table.addListener(SWT.Selection, event -> {
 				TableItem item = (TableItem) event.item;
 				int tableIndex = table.indexOf(item);
@@ -85,13 +95,13 @@ public class DiagramsConcentrationTable {
 				InconsistencyPanel.instace().filterInconsistenciesById(concentration.getId());
 			});
 		}
-		
+
 		for (int i = 0; i < tHead.size(); i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(tHead.get(i));
 			column.pack();
 		}
-		
+
 		table.pack();
 	}
 
@@ -99,7 +109,8 @@ public class DiagramsConcentrationTable {
 		table.removeAll();
 	}
 
-	public void fillConcentrations(List<InconsistencyConcentrationDTO> concentrations, List<DiagramStatisticsDTO> diagramStatistics) {
+	public void fillConcentrations(List<InconsistencyConcentrationDTO> concentrations,
+			List<DiagramStatisticsDTO> diagramStatistics) {
 		this.clearTable();
 		this.concentrations = concentrations;
 
@@ -123,16 +134,21 @@ public class DiagramsConcentrationTable {
 			int severity = concentration.getSeverity();
 			Color bgItem = colorBySeverity.get(severity > 0 && severity <= 3 ? severity : 1);
 			tItem.setBackground(i, bgItem);
-			if (severity >= 2) tItem.setForeground(i, this.table.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-			
+			if (severity >= 2)
+				tItem.setForeground(i, this.table.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
 			i++;
 			if (type.equals("diagram")) {
 				DiagramStatisticsDTO diagramStatistic = diagramStatistics.stream()
 						.filter(ds -> ds.getId().equals(concentration.getId())).findFirst().orElse(null);
-				
+
 				if (diagramStatistic != null) {
-					tItem.setText(i++, diagramStatistic.getRiskMisinterpretationStr() != null ? diagramStatistic.getRiskMisinterpretationStr() : "");
-					tItem.setText(i++, diagramStatistic.getSpreadRateStr() != null ? diagramStatistic.getSpreadRateStr(): "");
+					tItem.setText(i++,
+							diagramStatistic.getRiskMisinterpretationStr() != null
+									? diagramStatistic.getRiskMisinterpretationStr()
+									: "");
+					tItem.setText(i++,
+							diagramStatistic.getSpreadRateStr() != null ? diagramStatistic.getSpreadRateStr() : "");
 //					tItem.setText(i++, diagramStatistic.getConcentrationIncStr() != null ? diagramStatistic.getConcentrationIncStr() : "");
 				}
 			}

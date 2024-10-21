@@ -39,8 +39,8 @@ public class InconsistencyFetchAPI implements Runnable {
 						success = true;
 						break;
 					}
-					
-					lastCountInconsistencies = countInconsistencies;					
+
+					lastCountInconsistencies = countInconsistencies;
 				}
 
 				try {
@@ -54,7 +54,7 @@ public class InconsistencyFetchAPI implements Runnable {
 				System.out.println("Runnable Exception: " + e.getMessage());
 			}
 		}
-				
+
 		if (success || countSuccess > (this.maxRetries / 2)) {
 			InconsistencyPanel.instace().updateViewData(responseInconsistencies.getData());
 		} else {
