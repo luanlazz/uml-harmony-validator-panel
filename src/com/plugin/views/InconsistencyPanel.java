@@ -64,72 +64,34 @@ public class InconsistencyPanel extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		int gridCols = 10;
-		GridLayout layout = new GridLayout(gridCols, true);
-		parent.setLayout(layout);
+		parent.setLayout(new GridLayout(gridCols, true));
+		
 		Display display = parent.getDisplay();
 
 		// summary
-		this.summary = new Label(parent, PROP_TITLE);
-		GridData gridSummary = new GridData(SWT.FILL, SWT.CENTER, true, false, gridCols, 1);
-		this.summary.setLayoutData(gridSummary);
-		FontData[] fD = this.summary.getFont().getFontData();
-		fD[0].setHeight(20);
-		this.summary.setFont(new Font(display, fD[0]));
-		this.summary.setText(messages.get("summary.initial"));
+		setupSummaryLabel(parent, gridCols, display);
 
 		// Cols span tables
-		int tDiagramsCols = 3;
-		int tElementsCols = 2;
-		int tInconsistenciesCols = 5;
+		int diagramTableCols = 3;
+		int elementTableCols = 2;
+		int inconsistencyTableCols = 5;
 
-		this.labelDiagramsTable = new Label(parent, PROP_TITLE);
-		GridData gridMisinterpretation = new GridData(SWT.FILL, SWT.CENTER, true, false, tDiagramsCols, 1);
-		this.labelDiagramsTable.setLayoutData(gridMisinterpretation);
-		fD[0].setHeight(16);
-		this.labelDiagramsTable.setFont(new Font(display, fD[0]));
-		this.labelDiagramsTable.setText(messages.get("table.diagrams.label"));
+		setupDiagramTableLabel(parent, display, diagramTableCols);
+		setupElementTableLabel(parent, display, elementTableCols);
+		setupInconsistencyTableLabel(parent, display, inconsistencyTableCols);
 
-		this.labelElementsTable = new Label(parent, PROP_TITLE);
-		GridData gridSpreadRate = new GridData(SWT.FILL, SWT.CENTER, true, false, tElementsCols, 1);
-		this.labelElementsTable.setLayoutData(gridSpreadRate);
-		fD[0].setHeight(16);
-		this.labelElementsTable.setFont(new Font(display, fD[0]));
-		this.labelElementsTable.setText(messages.get("table.element.label"));
-
-		this.labelInconsistenciesTable = new Label(parent, PROP_TITLE);
-		GridData gridConcentrationInc = new GridData(SWT.FILL, SWT.CENTER, true, false, tInconsistenciesCols, 1);
-		this.labelInconsistenciesTable.setLayoutData(gridConcentrationInc);
-		fD[0].setHeight(16);
-		this.labelInconsistenciesTable.setFont(new Font(display, fD[0]));
-		this.labelInconsistenciesTable.setText(messages.get("table.inconsistency.label"));
-
-		// Concentration diagrams
 		this.diagramConcentrationTable.initializeColors(parent);
-		this.diagramConcentrationTable.initializeTable(parent, tDiagramsCols);
+		this.diagramConcentrationTable.initializeTable(parent, diagramTableCols);
 
-		// Concentration elements
 		this.elementsConcentrationTable.initializeColors(parent);
-		this.elementsConcentrationTable.initializeTable(parent, tElementsCols);
+		this.elementsConcentrationTable.initializeTable(parent, elementTableCols);
 
-		// Inconsistencies
 		this.inconsistenciesTable.initializeColors(parent);
-		this.inconsistenciesTable.initializeTable(parent, tInconsistenciesCols);
+		this.inconsistenciesTable.initializeTable(parent, inconsistencyTableCols);
 
-		// table details
-		this.labelTotalPkgs = new Label(parent, PROP_TITLE);
-		GridData gridTotalPkgs = new GridData(SWT.FILL, SWT.FILL, true, true, tDiagramsCols, 1);
-		this.labelTotalPkgs.setLayoutData(gridTotalPkgs);
-		this.updateTotalPkgs(0);
-
-		this.labelTotalElements = new Label(parent, PROP_TITLE);
-		GridData gridTotalElements = new GridData(SWT.FILL, SWT.FILL, true, true, tElementsCols, 1);
-		this.labelTotalElements.setLayoutData(gridTotalElements);
-		this.updateTotalElements(0);
-
-		this.labelTotalInconsistencies = new Label(parent, PROP_TITLE);
-		GridData gridTotalInconsistencies = new GridData(SWT.FILL, SWT.FILL, true, true, tInconsistenciesCols, 1);
-		this.labelTotalInconsistencies.setLayoutData(gridTotalInconsistencies);
-		this.updateTotalInconsistencies(0);
+		setupDiagramTableFooter(parent, diagramTableCols);
+		setupElementTableFooter(parent, elementTableCols);
+		setupInconsistencyTableFooter(parent, inconsistencyTableCols);
 	}
 
 	public void clearTables() {
@@ -233,5 +195,66 @@ public class InconsistencyPanel extends ViewPart {
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
+	}
+	
+	private void setupSummaryLabel(Composite parent, int gridCols, Display display) {
+		this.summary = new Label(parent, PROP_TITLE);
+		GridData gridSummary = new GridData(SWT.FILL, SWT.CENTER, true, false, gridCols, 1);
+		this.summary.setLayoutData(gridSummary);
+		FontData[] fD = this.summary.getFont().getFontData();
+		fD[0].setHeight(20);
+		this.summary.setFont(new Font(display, fD[0]));
+		this.summary.setText(messages.get("summary.initial"));
+	}
+	
+	private void setupDiagramTableLabel(Composite parent, Display display, int tDiagramsCols) {
+		this.labelDiagramsTable = new Label(parent, PROP_TITLE);
+		GridData gridMisinterpretation = new GridData(SWT.FILL, SWT.CENTER, true, false, tDiagramsCols, 1);
+		this.labelDiagramsTable.setLayoutData(gridMisinterpretation);
+		FontData[] fD = this.labelDiagramsTable.getFont().getFontData();
+		fD[0].setHeight(16);
+		this.labelDiagramsTable.setFont(new Font(display, fD[0]));
+		this.labelDiagramsTable.setText(messages.get("table.diagrams.label"));
+	}	
+
+	private void setupElementTableLabel(Composite parent, Display display, int tElementsCols) {
+		this.labelElementsTable = new Label(parent, PROP_TITLE);
+		GridData gridSpreadRate = new GridData(SWT.FILL, SWT.CENTER, true, false, tElementsCols, 1);
+		this.labelElementsTable.setLayoutData(gridSpreadRate);
+		FontData[] fD = this.labelElementsTable.getFont().getFontData();
+		fD[0].setHeight(16);
+		this.labelElementsTable.setFont(new Font(display, fD[0]));
+		this.labelElementsTable.setText(messages.get("table.element.label"));
+	}
+
+	private void setupInconsistencyTableLabel(Composite parent, Display display, int tInconsistenciesCols) {
+		this.labelInconsistenciesTable = new Label(parent, PROP_TITLE);
+		GridData gridConcentrationInc = new GridData(SWT.FILL, SWT.CENTER, true, false, tInconsistenciesCols, 1);
+		this.labelInconsistenciesTable.setLayoutData(gridConcentrationInc);
+		FontData[] fD = this.labelInconsistenciesTable.getFont().getFontData();
+		fD[0].setHeight(16);
+		this.labelInconsistenciesTable.setFont(new Font(display, fD[0]));
+		this.labelInconsistenciesTable.setText(messages.get("table.inconsistency.label"));
+	}
+	
+	private void setupDiagramTableFooter(Composite parent, int tDiagramsCols) {
+		this.labelTotalPkgs = new Label(parent, PROP_TITLE);
+		GridData gridTotalPkgs = new GridData(SWT.FILL, SWT.FILL, true, true, tDiagramsCols, 1);
+		this.labelTotalPkgs.setLayoutData(gridTotalPkgs);
+		this.updateTotalPkgs(0);
+	}
+
+	private void setupElementTableFooter(Composite parent, int tElementsCols) {
+		this.labelTotalElements = new Label(parent, PROP_TITLE);
+		GridData gridTotalElements = new GridData(SWT.FILL, SWT.FILL, true, true, tElementsCols, 1);
+		this.labelTotalElements.setLayoutData(gridTotalElements);
+		this.updateTotalElements(0);
+	}
+	
+	private void setupInconsistencyTableFooter(Composite parent, int tInconsistenciesCols) {
+		this.labelTotalInconsistencies = new Label(parent, PROP_TITLE);
+		GridData gridTotalInconsistencies = new GridData(SWT.FILL, SWT.FILL, true, true, tInconsistenciesCols, 1);
+		this.labelTotalInconsistencies.setLayoutData(gridTotalInconsistencies);
+		this.updateTotalInconsistencies(0);
 	}
 }
