@@ -68,10 +68,8 @@ public class InconsistencyPanel extends ViewPart {
 		
 		Display display = parent.getDisplay();
 
-		// summary
 		setupSummaryLabel(parent, gridCols, display);
 
-		// Cols span tables
 		int diagramTableCols = 3;
 		int elementTableCols = 2;
 		int inconsistencyTableCols = 5;
@@ -80,13 +78,8 @@ public class InconsistencyPanel extends ViewPart {
 		setupElementTableLabel(parent, display, elementTableCols);
 		setupInconsistencyTableLabel(parent, display, inconsistencyTableCols);
 
-		this.diagramConcentrationTable.initializeColors(parent);
 		this.diagramConcentrationTable.initializeTable(parent, diagramTableCols);
-
-		this.elementsConcentrationTable.initializeColors(parent);
 		this.elementsConcentrationTable.initializeTable(parent, elementTableCols);
-
-		this.inconsistenciesTable.initializeColors(parent);
 		this.inconsistenciesTable.initializeTable(parent, inconsistencyTableCols);
 
 		setupDiagramTableFooter(parent, diagramTableCols);
@@ -111,16 +104,20 @@ public class InconsistencyPanel extends ViewPart {
 		int numInconsistencies = inconsistencies != null ? inconsistencies.size() : 0;
 		if (numInconsistencies > 0) {
 			List<InconsistencyConcentrationDTO> diagrams = data.getDiagrams();
-			diagramConcentrationTable.fillConcentrations(diagrams, data.getDiagramStatistics());
-			updateTotalPkgs(diagrams.size());
-
-			String diagramId = diagrams.size() > 0 ? diagrams.get(0).getId() : null;
-			filterElementsByDiagramId(diagramId);
+			fillDiagramTable(diagrams);
 		}
 
 		updateSummary(numInconsistencies);
 	}
 
+	private void fillDiagramTable(List<InconsistencyConcentrationDTO> diagrams) {
+		diagramConcentrationTable.fillConcentrations(diagrams, data.getDiagramStatistics());
+		updateTotalPkgs(diagrams.size());
+
+		String diagramId = diagrams.size() > 0 ? diagrams.get(0).getId() : null;
+		filterElementsByDiagramId(diagramId);
+	}
+	
 	public void filterElementsByDiagramId(String diagramId) {
 		List<InconsistencyConcentrationDTO> elements = data.getDiagramsElements();
 

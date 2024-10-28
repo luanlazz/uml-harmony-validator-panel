@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -57,16 +55,14 @@ public class DiagramsConcentrationTable {
 	}
 
 	public void initializeTable(Composite parent, int cols) {
+		initializeColors(parent);
+		
 		setTable(new Table(parent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION));
 		GridData gridTable = new GridData(SWT.FILL, SWT.FILL, true, true, cols, 1);
 		gridTable.heightHint = 130;
 		table.setLayoutData(gridTable);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
-
-		FontData[] fD = table.getFont().getFontData();
-		fD[0].setHeight(16);
-		table.setFont(new Font(table.getDisplay(), fD[0]));
 
 		List<String> tHead = new ArrayList<String>();
 
@@ -116,9 +112,6 @@ public class DiagramsConcentrationTable {
 
 		for (InconsistencyConcentrationDTO concentration : concentrations) {
 			TableItem tItem = new TableItem(table, SWT.NONE);
-			FontData[] fD = tItem.getFont().getFontData();
-			fD[0].setHeight(16);
-			tItem.setFont(new Font(table.getDisplay(), fD[0]));
 
 			tItem.setData(concentration);
 
