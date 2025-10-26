@@ -84,10 +84,14 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 ## 🧩 Configuration
 
 1. In Eclipse, open it by navigating to **Window ▸ Show View ▸ Other...**, then searching for **UML Harmony Validator Panel** in the pop-up dialog, double click to add to your workspace.
-   ![papyrus show view](images/papyrus_show_view.png)
+   
+   ![Papyrus show view](images/papyrus_show_view.png)
+
 2. Open the **UML Harmony Validator ▸ Plug-in Settings** menu.
-   ![plug-in menu](images/plug_in_menu_settings.png)
-   ![plug-in settings](images/plug_in_settings.png)
+   ![Plug-in menu](images/plug_in_menu_settings.png)
+
+   ![Plug-in settings](images/plug_in_settings.png)
+
 4. Set the **Service URL** to point to the backend validator service, for example:
    ```
    http://localhost:8080/kafka
@@ -100,24 +104,30 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 ## 🔎 Usage
 
 1. Open any UML project file within your Eclipse workspace.
-   ![papyrus workspace](images/papyrus_workspace_1.png)
+   
+   ![Papyrus workspace](images/papyrus_workspace_1.png)
 
 2. Open any UML model (`.uml`).
+   
    ![UML File](images/papyrus_workspace_2.png)
 
 3. On Plug-in view click on short-cut icon or navigate to:
   **Menu ▸ Analyze Model**
+   
    ![Analyze model action](images/papyrus_workspace_3.png)
 
 4. The plug-in will:
    * Send the model to the configured backend service.
    * Retrieve and display inconsistency results in the **Plug-in View**.
+   
    ![Inconsistency results](images/papyrus_workspace_4.png)
 
 5. Navigate between inconsistency results:
    - Diagram and element boxes are interactive.
    - Click a **diagram** to display its **elements**, then click an **element** to view its corresponding **inconsistencies**.
+   
    ![Sequence diagram](images/papyrus_workspace_5.png)
+   
    ![Class diagram](images/papyrus_workspace_6.png)
 
 > [!NOTE]
