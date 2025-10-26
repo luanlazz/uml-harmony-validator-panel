@@ -13,7 +13,7 @@ It connects to a remote validation [service](https://github.com/luanlazz/uml-har
   - [🧩 Configuration](#-configuration)
   - [🔎 Usage](#-usage)
   - [🧪 Example Workflow](#-example-workflow)
-  - [License](#license)
+  - [📄 License](#-license)
   - [🤝 Related Projects](#-related-projects)
 
 ## 🧭 Overview
@@ -141,9 +141,9 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 4. Review the analysis results:
    * **Errors/Warnings** listed in the **Plug-in View**.
   
-## License
+## 📄 License
 
-This repository is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. You may not use the material for commercial purposes. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the [MIT License](LICENSE).
 
 ## 🤝 Related Projects
 
