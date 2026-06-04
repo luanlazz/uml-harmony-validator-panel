@@ -66,15 +66,17 @@ public class InconsistenciesAnalyserHandler extends AbstractHandler {
 
         byte[] umlBytes = tryExtractFromPapyrusEditor(activeEditor);
 
-		IFile file = activeEditor.getEditorInput().getAdapter(IFile.class);
-		if (file == null) {
-			throw new ExecutionException((new FileNotFoundException()).getMessage());
-		}
+        AnalyserResponseDTO analyseResponse;
 
-		AnalyserResponseDTO analyseResponse = analyserService.analyseFile(file);
-		if (!analyseResponse.getSuccess()) {
-			throw new ExecutionException(analyseResponse.getError());
-		}
+        if (umlBytes != null) {
+            analyseResponse = analyserService.analyseBytes(umlBytes, "test");
+        } else {
+        	IFile file = activeEditor.getEditorInput().getAdapter(IFile.class);
+    		if (file == null) throw new ExecutionException((new FileNotFoundException()).getMessage());
+    		analyseResponse = analyserService.analyseFile(file);
+        }
+
+		if (!analyseResponse.getSuccess()) throw new ExecutionException(analyseResponse.getError());
 
 		return analyseResponse;
 	}

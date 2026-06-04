@@ -10,7 +10,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.xmi,
- com.google.gson
+ org.eclipse.emf.edit,
+ com.google.gson,
+ org.apache.httpcomponents.httpclient,
+ org.apache.httpcomponents.httpcore
 Automatic-Module-Name: continuous.inconsistency
 Bundle-ClassPath: icons/,
  .
