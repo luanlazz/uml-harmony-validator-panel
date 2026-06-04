@@ -61,7 +61,7 @@ public class InconsistencyAnalyserAPI {
 	public AnalyserResponseDTO analyseBytes(byte[] modelBytes, String filename)throws AnalyserException {
 
         String baseUrl = getUrlBase();
-        if (baseUrl == null || baseUrl.isBlank()) throw new AnalyserException("Base URL is not configured. Set it via menu > preferences.");
+        if (baseUrl == null || baseUrl.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
 
         String url = baseUrl + ENDPOINT_ANALYSE;
 

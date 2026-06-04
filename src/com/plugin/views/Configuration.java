@@ -31,7 +31,7 @@ public class Configuration {
 		Label label = new Label(dialog, SWT.NONE | SWT.BORDER);
 		label.setText("Service URL");
 		Text text = new Text(dialog, SWT.NONE);
-		text.setText(InconsistencyAnalyserAPI.getUrl());
+		text.setText(InconsistencyAnalyserAPI.getUrlBase());
 
 		GC gc = new GC(text);
 		FontMetrics fm = gc.getFontMetrics();
