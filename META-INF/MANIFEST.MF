@@ -8,6 +8,8 @@ Import-Package: com.google.gson
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.emf.ecore,
+ org.eclipse.emf.ecore.xmi,
  com.google.gson
 Automatic-Module-Name: continuous.inconsistency
 Bundle-ClassPath: icons/,
