@@ -54,13 +54,7 @@ public class InconsistenciesAnalyserHandler extends AbstractHandler {
 	}
 
 	private AnalyserResponseDTO analyseActiveEditor() throws Exception {
-		IWorkbenchPart workbenchPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-				.getActivePart();
-
-		IEditorPart activeEditor = workbenchPart.getSite().getPage().getActiveEditor();
-		if (activeEditor == null) {
-			throw new ExecutionException("Open a file first!");
-		}
+		IEditorPart activeEditor = resolveActiveEditor();
 
 		IFile file = activeEditor.getEditorInput().getAdapter(IFile.class);
 		if (file == null) {
@@ -74,4 +68,14 @@ public class InconsistenciesAnalyserHandler extends AbstractHandler {
 
 		return analyseResponse;
 	}
+	
+	private IEditorPart resolveActiveEditor() throws ExecutionException {
+        IWorkbenchPart workbenchPart = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().getActivePart();
+
+        IEditorPart activeEditor = workbenchPart.getSite().getPage().getActiveEditor();
+        if (activeEditor != null) return activeEditor;
+        
+        throw new ExecutionException("Open a UML model file first!");
+    }
 }
