@@ -20,7 +20,7 @@ import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistencyErrorDTO;
 import com.plugin.views.InconsistencyPanel;
 
-public class AnalyseInconsistenciesHandler extends AbstractHandler {
+public class InconsistenciesAnalyserHandler extends AbstractHandler {
 
 	private InconsistencyAnalyserAPI analyserService = new InconsistencyAnalyserAPI();
 
