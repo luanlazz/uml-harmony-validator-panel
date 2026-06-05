@@ -58,7 +58,6 @@ public class InconsistencyAnalyserAPI {
     }
 
 	public AnalyserResponseDTO analyseBytes(byte[] modelBytes, String filename)throws AnalyserException {
-
         String url = getUrlBase();
         if (url == null || url.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
 
@@ -77,10 +76,10 @@ public class InconsistencyAnalyserAPI {
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse resp = client.execute(request)) {
 
-            int status = resp.getStatusLine().getStatusCode();
+            int statusCode = resp.getStatusLine().getStatusCode();
             String body = EntityUtils.toString(resp.getEntity(), "UTF-8");
 
-            if (status < 200 || status > 299) throw new AnalyserException("Server returned HTTP " + status + ": " + body);
+            if (statusCode < 200 || statusCode > 299) throw new AnalyserException("Server returned HTTP " + statusCode + ": " + body);
 
             return Json2Obj.deserializeObj(body, AnalyserResponseDTO.class);
         } catch (IOException e) {
