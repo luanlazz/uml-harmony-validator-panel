@@ -57,7 +57,7 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 				Display.getDefault().asyncExec(fetchAPI);
 			}
 		} catch (Exception e) {
-			System.out.println("AnalyseInconsistenciesHandler exception: " + e.getMessage());
+			logWarning(e.getMessage(), e);
 		}
 
 		return inconsistencies;
@@ -66,108 +66,104 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	private AnalyserResponseDTO analyseActiveEditor() throws Exception {
 		IEditorPart activeEditor = resolveActiveEditor();
 
-        byte[] umlBytes = tryExtractFromPapyrusEditor(activeEditor);
+		byte[] umlBytes = tryExtractFromPapyrusEditor(activeEditor);
 
-        AnalyserResponseDTO analyseResponse;
+		AnalyserResponseDTO analyseResponse;
 
-        if (umlBytes != null) {
-            analyseResponse = analyserService.analyseBytes(umlBytes, "test");
-        } else {
-        	IFile file = activeEditor.getEditorInput().getAdapter(IFile.class);
-    		if (file == null) throw new ExecutionException((new FileNotFoundException()).getMessage());
-    		analyseResponse = analyserService.analyseFile(file);
-        }
+		if (umlBytes != null) {
+			analyseResponse = analyserService.analyseBytes(umlBytes, "model.uml");
+		} else {
+			IFile file = activeEditor.getEditorInput().getAdapter(IFile.class);
+			if (file == null) throw new ExecutionException((new FileNotFoundException()).getMessage());
+			analyseResponse = analyserService.analyseFile(file);
+		}
 
 		if (!analyseResponse.getSuccess()) throw new ExecutionException(analyseResponse.getError());
 
 		return analyseResponse;
 	}
-	
+
 	private byte[] tryExtractFromPapyrusEditor(IEditorPart editor) {
 		ResourceSet resourceSet = null;
 
-	    resourceSet = editor.getAdapter(ResourceSet.class);
+		resourceSet = editor.getAdapter(ResourceSet.class);
+		if (resourceSet == null) resourceSet = resourceSetViaReflection(editor);
+		if (resourceSet == null) return null;
 
-	    if (resourceSet == null) {
-	        resourceSet = resourceSetViaReflection(editor);
-	    }
+		Resource umlResource = findUmlResource(resourceSet);
+		if (umlResource == null) return null;
 
-	    if (resourceSet == null) return null;
-
-	    Resource umlResource = findUmlResource(resourceSet);
-	    if (umlResource == null) return null;
-
-	    try {
-	        return serialiseToBytes(umlResource);
-	    } catch (Exception e) {
-	        logWarning("In-memory serialisation failed; falling back to file.", e);
-	        return null;
-	    }
-    }
-	
-	private byte[] serialiseToBytes(Resource source) throws Exception {
-        ResourceSet temp = new ResourceSetImpl();
-        temp.getResourceFactoryRegistry()
-            .getExtensionToFactoryMap()
-            .putIfAbsent("uml", new XMIResourceFactoryImpl());
-
-        URI memURI = URI.createURI("memory://__snapshot__.uml");
-        Resource snapshot = temp.createResource(memURI);
-
-        for (EObject root : source.getContents()) {
-            snapshot.getContents().add(EcoreUtil.copy(root));
-        }
-                
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        snapshot.save(out, Collections.emptyMap());
-
-        return out.toByteArray();
-    }
-	
-	private ResourceSet resourceSetViaReflection(IEditorPart editor) {
-	    try {
-	        Method getEditingDomain = editor.getClass().getMethod("getEditingDomain");
-	        Object editingDomain = getEditingDomain.invoke(editor);
-	        if (editingDomain == null) return null;
-
-	        Method getResourceSet = editingDomain.getClass().getMethod("getResourceSet");
-	        Object rs = getResourceSet.invoke(editingDomain);
-
-	        if (rs instanceof ResourceSet) {
-	            return (ResourceSet) rs;
-	        }
-
-	    } catch (NoSuchMethodException ignored) {
-	        // Editor doesn't expose an editing domain — file fallback will handle it
-	    } catch (Exception e) {
-	        logWarning("Reflection-based domain lookup failed.", e);
-	    }
-	    
-	    return null;
+		try {
+			return serialiseToBytes(umlResource);
+		} catch (Exception e) {
+			logWarning("In-memory serialisation failed; falling back to file.", e);
+			return null;
+		}
 	}
-	
-	private Resource findUmlResource(ResourceSet resourceSet) {
-        for (Resource resource : resourceSet.getResources()) {
-            URI uri = resource.getURI();
-            if (uri != null && "uml".equalsIgnoreCase(uri.fileExtension())) {
-                return resource;
-            }
-        }
-        return null;
-    }
-	
-	private IEditorPart resolveActiveEditor() throws ExecutionException {
-        IWorkbenchPart workbenchPart = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().getActivePart();
 
-        IEditorPart activeEditor = workbenchPart.getSite().getPage().getActiveEditor();
-        if (activeEditor != null) return activeEditor;
-        
-        throw new ExecutionException("Open a UML model file first!");
-    }
-	
+	private byte[] serialiseToBytes(Resource source) throws Exception {
+		ResourceSet temp = new ResourceSetImpl();
+		temp.getResourceFactoryRegistry()
+        	.getExtensionToFactoryMap()
+        	.putIfAbsent("uml", new XMIResourceFactoryImpl());
+		
+		URI memURI = URI.createURI("memory://__snapshot__.uml");
+		Resource snapshot = temp.createResource(memURI);
+
+		for (EObject root : source.getContents()) {
+			snapshot.getContents().add(EcoreUtil.copy(root));
+		}
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		snapshot.save(out, Collections.emptyMap());
+
+		return out.toByteArray();
+	}
+
+	private ResourceSet resourceSetViaReflection(IEditorPart editor) {
+		try {
+			Method getEditingDomain = editor.getClass().getMethod("getEditingDomain");
+			Object editingDomain = getEditingDomain.invoke(editor);
+			if (editingDomain == null) return null;
+
+			Method getResourceSet = editingDomain.getClass().getMethod("getResourceSet");
+			Object rs = getResourceSet.invoke(editingDomain);
+
+			if (rs instanceof ResourceSet) {
+				return (ResourceSet) rs;
+			}
+
+		} catch (NoSuchMethodException ignored) {
+			// Editor doesn't expose an editing domain — file fallback will handle it
+		} catch (Exception e) {
+			logWarning("Reflection-based domain lookup failed.", e);
+		}
+
+		return null;
+	}
+
+	private Resource findUmlResource(ResourceSet resourceSet) {
+		for (Resource resource : resourceSet.getResources()) {
+			URI uri = resource.getURI();
+			if (uri != null && "uml".equalsIgnoreCase(uri.fileExtension())) {
+				return resource;
+			}
+		}
+		return null;
+	}
+
+	private IEditorPart resolveActiveEditor() throws ExecutionException {
+		IWorkbenchPart workbenchPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.getActivePart();
+
+		IEditorPart activeEditor = workbenchPart.getSite().getPage().getActiveEditor();
+		if (activeEditor != null) return activeEditor;
+
+		throw new ExecutionException("Open a UML model file first!");
+	}
+
 	private void logWarning(String message, Exception e) {
-        System.err.println("[AnalyserHandler] " + message);
-        if (e != null) e.printStackTrace();
-    }
+		System.err.println("[AnalyserHandler] " + message);
+		if (e != null) e.printStackTrace();
+	}
 }
