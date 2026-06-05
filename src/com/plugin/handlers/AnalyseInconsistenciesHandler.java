@@ -66,12 +66,12 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	private AnalyserResponseDTO analyseActiveEditor() throws Exception {
 		IEditorPart activeEditor = resolveActiveEditor();
 
-		byte[] umlBytes = tryExtractFromPapyrusEditor(activeEditor);
+		ModelSnapshotAdapter snapshotAdapter = tryExtractFromPapyrusEditor(activeEditor);
 
 		AnalyserResponseDTO analyseResponse;
 
-		if (umlBytes != null) {
-			analyseResponse = analyserService.analyseBytes(umlBytes, "model.uml");
+		if (snapshotAdapter != null) {
+			analyseResponse = analyserService.analyseBytes(snapshotAdapter.bytes, snapshotAdapter.fileName);
 		} else {
 			IFile file = activeEditor.getEditorInput().getAdapter(IFile.class);
 			if (file == null) throw new ExecutionException((new FileNotFoundException()).getMessage());
@@ -83,7 +83,7 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		return analyseResponse;
 	}
 
-	private byte[] tryExtractFromPapyrusEditor(IEditorPart editor) {
+	private ModelSnapshotAdapter tryExtractFromPapyrusEditor(IEditorPart editor) {
 		ResourceSet resourceSet = null;
 
 		resourceSet = editor.getAdapter(ResourceSet.class);
@@ -94,7 +94,10 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		if (umlResource == null) return null;
 
 		try {
-			return serialiseToBytes(umlResource);
+	        byte[] bytes = serialiseToBytes(umlResource);
+	        String fileName = umlResource.getURI().lastSegment();
+
+			return new ModelSnapshotAdapter(bytes, fileName);
 		} catch (Exception e) {
 			logWarning("In-memory serialisation failed; falling back to file.", e);
 			return null;
