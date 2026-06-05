@@ -28,7 +28,7 @@ import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistencyErrorDTO;
 import com.plugin.views.InconsistencyPanel;
 
-public class InconsistenciesAnalyserHandler extends AbstractHandler {
+public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 	private InconsistencyAnalyserAPI analyserService = new InconsistencyAnalyserAPI();
 
