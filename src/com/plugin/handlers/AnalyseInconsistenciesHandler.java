@@ -13,9 +13,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
@@ -112,12 +114,12 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
         URI memURI = URI.createURI("memory://__snapshot__.uml");
         Resource snapshot = temp.createResource(memURI);
 
-        snapshot.getContents().addAll(new ArrayList<>(source.getContents()));
-
+        for (EObject root : source.getContents()) {
+            snapshot.getContents().add(EcoreUtil.copy(root));
+        }
+                
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         snapshot.save(out, Collections.emptyMap());
-
-        source.getContents().addAll(snapshot.getContents());
 
         return out.toByteArray();
     }
