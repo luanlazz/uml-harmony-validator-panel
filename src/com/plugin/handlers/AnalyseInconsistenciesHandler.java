@@ -1,7 +1,6 @@
 package com.plugin.handlers;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +11,9 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -24,6 +26,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
+import com.plugin.handlers.adapter.ModelSnapshotAdapter;
 import com.plugin.services.InconsistencyAnalyserAPI;
 import com.plugin.services.InconsistencyFetchAPI;
 import com.plugin.services.dto.AnalyserResponseDTO;
@@ -73,9 +76,8 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		if (snapshotAdapter != null) {
 			analyseResponse = analyserService.analyseBytes(snapshotAdapter.bytes, snapshotAdapter.fileName);
 		} else {
-			IFile file = activeEditor.getEditorInput().getAdapter(IFile.class);
-			if (file == null) throw new ExecutionException((new FileNotFoundException()).getMessage());
-			analyseResponse = analyserService.analyseFile(file);
+			IFile umlFile = resolveUmlFile(activeEditor);
+			analyseResponse = analyserService.analyseFile(umlFile);
 		}
 
 		if (!analyseResponse.getSuccess()) throw new ExecutionException(analyseResponse.getError());
@@ -94,8 +96,8 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		if (umlResource == null) return null;
 
 		try {
-	        byte[] bytes = serialiseToBytes(umlResource);
-	        String fileName = umlResource.getURI().lastSegment();
+			byte[] bytes = serialiseToBytes(umlResource);
+			String fileName = umlResource.getURI().lastSegment();
 
 			return new ModelSnapshotAdapter(bytes, fileName);
 		} catch (Exception e) {
@@ -153,6 +155,50 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 			}
 		}
 		return null;
+	}
+
+	private IFile resolveUmlFile(IEditorPart activeEditor) throws ExecutionException {
+		IFile openFile = activeEditor.getEditorInput().getAdapter(IFile.class);
+
+		if (openFile != null && "uml".equalsIgnoreCase(openFile.getFileExtension())) return openFile;
+
+		if (openFile != null) {
+			IFile sibling = swapExtension(openFile, "uml");
+			if (sibling != null) return sibling;
+		}
+
+		if (openFile != null) {
+			IFile found = findUmlInProject(openFile.getProject());
+			if (found != null) return found;
+		}
+
+		throw new ExecutionException("Could not locate a .uml model file. Please open the model (.uml, .di, or .notation).");
+	}
+
+	private IFile swapExtension(IFile file, String ext) {
+		IPath newPath = file.getFullPath().removeFileExtension().addFileExtension(ext);
+		IFile candidate = ResourcesPlugin.getWorkspace().getRoot().getFile(newPath);
+		return candidate.exists() ? candidate : null;
+	}
+
+	private IFile findUmlInProject(IProject project) {
+		IFile[] result = { null };
+		try {
+			project.accept(resource -> {
+				if (result[0] != null) return false;
+				if (resource instanceof IFile) {
+					IFile f = (IFile) resource;
+					if ("uml".equalsIgnoreCase(f.getFileExtension())) {
+						result[0] = f;
+						return false;
+					}
+				}
+				return true;
+			});
+		} catch (Exception ignored) {
+		}
+
+		return result[0];
 	}
 
 	private IEditorPart resolveActiveEditor() throws ExecutionException {
