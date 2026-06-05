@@ -27,7 +27,6 @@ import com.plugin.utils.Json2Obj;
 public class InconsistencyAnalyserAPI {
 
     private static final String PREF_KEY_BASE_URL = "base_url";
-    private static final String ENDPOINT_ANALYSE = "/analyse";
     private static final ContentType UML_CONTENT_TYPE = ContentType.create("application/xml", "UTF-8");
     
 	private MessageProvider messages;
@@ -60,10 +59,8 @@ public class InconsistencyAnalyserAPI {
 
 	public AnalyserResponseDTO analyseBytes(byte[] modelBytes, String filename)throws AnalyserException {
 
-        String baseUrl = getUrlBase();
-        if (baseUrl == null || baseUrl.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
-
-        String url = baseUrl + ENDPOINT_ANALYSE;
+        String url = getUrlBase();
+        if (url == null || url.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
 
         HttpEntity multipart = MultipartEntityBuilder.create()
                 .addBinaryBody(
@@ -95,7 +92,7 @@ public class InconsistencyAnalyserAPI {
 		HttpURLConnection connection = null;
 
 		try {
-			String urlWithClient = getUrlBase() + "/inconsistencies/" + clientId;
+			String urlWithClient = getUrlBase() + "/" + clientId;
 			URL url = new URL(urlWithClient);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
