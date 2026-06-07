@@ -41,7 +41,7 @@ public class InconsistencyPanel extends ViewPart {
 
 	private static InconsistencyPanel single_instance = null;
 
-	InconsistenciesResponse data = null;
+	private InconsistenciesResponse viewData = null;
 
 	private InconsistenciesTable inconsistenciesTable = new InconsistenciesTable();
 
@@ -105,12 +105,12 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void updateViewData(InconsistenciesResponse responseData) {
-		data = responseData;
+		viewData = responseData;
 
-		List<InconsistencyErrorDTO> inconsistencies = data.getInconsistencies();
+		List<InconsistencyErrorDTO> inconsistencies = viewData.getInconsistencies();
 		int numInconsistencies = inconsistencies != null ? inconsistencies.size() : 0;
 		if (numInconsistencies > 0) {
-			List<InconsistencyConcentrationDTO> diagrams = data.getDiagrams();
+			List<InconsistencyConcentrationDTO> diagrams = viewData.getDiagrams();
 			fillDiagramTable(diagrams);
 		}
 
@@ -118,7 +118,7 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	private void fillDiagramTable(List<InconsistencyConcentrationDTO> diagrams) {
-		diagramConcentrationTable.fillConcentrations(diagrams, data.getDiagramStatistics());
+		diagramConcentrationTable.fillConcentrations(diagrams, viewData.getDiagramStatistics());
 		updateTotalPkgs(diagrams.size());
 
 		String diagramId = diagrams.size() > 0 ? diagrams.get(0).getId() : null;
@@ -126,13 +126,13 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void filterElementsByDiagramId(String diagramId) {
-		List<InconsistencyConcentrationDTO> elements = data.getDiagramsElements();
+		List<InconsistencyConcentrationDTO> elements = viewData.getDiagramsElements();
 
 		if (diagramId != null) {
 			elements = elements.stream().filter(e -> e.getParentId().equals(diagramId)).toList();
 		}
 
-		elementsConcentrationTable.fillConcentrations(elements, data.getDiagramStatistics());
+		elementsConcentrationTable.fillConcentrations(elements, viewData.getDiagramStatistics());
 		updateTotalElements(elements.size());
 
 		String elementId = elements.size() > 0 ? elements.get(0).getId() : null;
@@ -140,7 +140,7 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void filterInconsistenciesById(String id) {
-		List<InconsistencyErrorDTO> inconsistencies = data.getInconsistencies();
+		List<InconsistencyErrorDTO> inconsistencies = viewData.getInconsistencies();
 
 		if (id != null) {
 			inconsistencies = inconsistencies.stream().filter(i -> i.getParentId().equals(id) || i.getElId().equals(id))
