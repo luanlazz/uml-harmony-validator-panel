@@ -1,144 +1,113 @@
 package com.plugin.services;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
 import java.nio.file.Files;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.eclipse.core.resources.IFile;
 
+import com.plugin.exceptions.AnalyserException;
 import com.plugin.i18n.MessageService;
 import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistenciesResponseDTO;
 import com.plugin.utils.Json2Obj;
+import com.plugin.utils.PluginLogger;
 
 public class InconsistencyAnalyserAPI {
 
-	public static String URL_BASE = "";
+	private static final PluginLogger LOGGER = new PluginLogger(InconsistencyAnalyserAPI.class);
+
+    private static final String PREF_KEY_BASE_URL = "base_url";
+    private static final ContentType UML_CONTENT_TYPE = ContentType.create("application/xml", "UTF-8");
+    
 	private MessageService messageService;
 
 	public InconsistencyAnalyserAPI() {
-		getUrl();
 		this.messageService = MessageService.instance();
 	}
-
+	
 	public static void setUrlBase(String url) {
-		AppPreferences.put("base_rul", url);
-		URL_BASE = url;
+        AppPreferences.put(PREF_KEY_BASE_URL, url);
+    }
+
+	public static String getUrlBase() {
+		return AppPreferences.get(PREF_KEY_BASE_URL);
 	}
+	
+	public AnalyserResponseDTO analyseFile(IFile iFile) throws AnalyserException {
+        File file = iFile.getRawLocation().makeAbsolute().toFile();
+        return analyseFile(file);
+    }
 
-	public static String getUrl() {
-		URL_BASE = AppPreferences.get("base_rul");
-		return URL_BASE;
-	}
+    public AnalyserResponseDTO analyseFile(File file) throws AnalyserException {
+        try {
+            byte[] bytes = Files.readAllBytes(file.toPath());
+            return analyseBytes(bytes, file.getName());
+        } catch (IOException e) {
+            throw new AnalyserException("Could not read file: " + file.getAbsolutePath(), e);
+        }
+    }
 
-	public AnalyserResponseDTO analyseFile(IFile iFile) {
-		String url = URL_BASE + "/send";
-		String charset = "UTF-8";
-		String param = "/send";
-		File textFile = iFile.getRawLocation().makeAbsolute().toFile();
-		String boundary = Long.toHexString(System.currentTimeMillis()); // Just generate some unique random value.
-		String CRLF = "\r\n"; // Line separator required by multipart/form-data.
-		HttpURLConnection connection = null;
+	public AnalyserResponseDTO analyseBytes(byte[] modelBytes, String filename) throws AnalyserException {
+        String url = getUrlBase();
+        if (url == null || url.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
 
-		try {
-			connection = (HttpURLConnection) new URL(url).openConnection();
-			connection.setDoOutput(true);
-			connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-			connection.setRequestProperty("Accept-Language", this.messageService.getLocale().toString());
+        HttpEntity multipart = MultipartEntityBuilder.create()
+                .addBinaryBody(
+                        "file",
+                        modelBytes,
+                        UML_CONTENT_TYPE,
+                        filename)
+                .build();
 
-			OutputStream output = connection.getOutputStream();
-			PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
+        HttpPost request = new HttpPost(url);
+        request.setEntity(multipart);
+        request.setHeader("Accept-Language", messageService.getLocale().toString());
 
-			// Send normal param.
-			writer.append("--" + boundary).append(CRLF);
-			writer.append("Content-Disposition: form-data; name=\"param\"").append(CRLF);
-			writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF);
-			writer.append(CRLF).append(param).append(CRLF).flush();
+        try (CloseableHttpClient client = HttpClients.createDefault();
+             CloseableHttpResponse resp = client.execute(request)) {
 
-			// Send text file.
-			writer.append("--" + boundary).append(CRLF);
-			writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + textFile.getName() + "\"")
-					.append(CRLF);
-			writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF); // Text file itself must be
-																						// saved in this charset!
-			writer.append(CRLF).flush();
-			Files.copy(textFile.toPath(), output);
-			output.flush(); // Important before continuing with writer!
-			writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
+            int statusCode = resp.getStatusLine().getStatusCode();
+            String body = EntityUtils.toString(resp.getEntity(), "UTF-8");
 
-			// End of multipart/form-data.
-			writer.append("--" + boundary + "--").append(CRLF).flush();
+            if (statusCode < 200 || statusCode > 299) throw new AnalyserException("Server returned HTTP " + statusCode + ": " + body);
 
-			int responseCode = connection.getResponseCode();
+            return Json2Obj.deserializeObj(body, AnalyserResponseDTO.class);
+        } catch (IOException exception) {
+        	LOGGER.error("HTTP POST request to [" + url + "] failed.", exception);
+            throw new AnalyserException("HTTP POST request to [" + url + "] failed.", exception);
+        }
+    }
 
-			StringBuilder sb = new StringBuilder();
-			BufferedReader br = null;
-			if (responseCode >= 200 && responseCode <= 299) {
-				br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			} else {
-				br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-			}
+	public InconsistenciesResponseDTO getInconsistenciesByClientId(String clientId) throws AnalyserException {
+	    String urlBase = getUrlBase();
+	    if (urlBase == null || urlBase.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
 
-			String strCurrentLine;
-			while ((strCurrentLine = br.readLine()) != null) {
-				sb.append(strCurrentLine);
-			}
+	    String url = urlBase + "/" + clientId;
+	    HttpGet request = new HttpGet(url);
+	    request.setHeader("Accept-Language", messageService.getLocale().toString());
 
-			return Json2Obj.deserializeObj(sb.toString(), AnalyserResponseDTO.class);
-		} catch (Exception e) {
-			System.out.println("analyseFile exception" + e.toString());
-		} finally {
-			if (connection != null) {
-				connection.disconnect();
-			}
-		}
+	    try (CloseableHttpClient client = HttpClients.createDefault();
+	         CloseableHttpResponse resp = client.execute(request)) {
 
-		return new AnalyserResponseDTO();
-	}
+	        int statusCode = resp.getStatusLine().getStatusCode();
+	        String body = EntityUtils.toString(resp.getEntity(), "UTF-8");
 
-	public InconsistenciesResponseDTO getInconsistenciesByClientId(String clientId) {
-		HttpURLConnection connection = null;
+	        if (statusCode < 200 || statusCode > 299) throw new AnalyserException("Server returned HTTP " + statusCode + ": " + body);
 
-		try {
-			String urlWithClient = URL_BASE + "/inconsistencies/" + clientId;
-			URL url = new URL(urlWithClient);
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept-Language", this.messageService.getLocale().toString());
-			connection.setConnectTimeout(5000);
-			connection.setReadTimeout(5000);
-
-			int responseCode = connection.getResponseCode();
-
-			StringBuilder sb = new StringBuilder();
-			BufferedReader br = null;
-			if (responseCode >= 200 && responseCode <= 299) {
-				br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			} else {
-				br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-			}
-
-			String strCurrentLine;
-			while ((strCurrentLine = br.readLine()) != null) {
-				sb.append(strCurrentLine);
-			}
-
-			return Json2Obj.deserializeObj(sb.toString(), InconsistenciesResponseDTO.class);
-		} catch (Exception e) {
-			System.out.println("getInconsistenciesByClientId exception:" + e.toString());
-		} finally {
-			if (connection != null) {
-				connection.disconnect();
-			}
-		}
-
-		return new InconsistenciesResponseDTO();
+	        return Json2Obj.deserializeObj(body, InconsistenciesResponseDTO.class);
+	    } catch (IOException exception) {
+	        LOGGER.error("HTTP GET request to [" + url + "] failed.", exception);
+	        throw new AnalyserException("HTTP GET request to [" + url + "] failed.", exception);
+	    }
 	}
 }

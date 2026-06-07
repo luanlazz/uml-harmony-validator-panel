@@ -37,7 +37,7 @@
       <command
             defaultHandler="com.plugin.handlers.SettingsHandler"
             id="com.inconsistency.handlers.settingscommand"
-            name="settings">
+            name="Settings">
       </command>
    </extension>
    <extension
