@@ -54,16 +54,13 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 			AnalyserResponseDTO analyseResponse = analyseActiveEditor();
 
-			if (analyseResponse.getSuccess()) {
-				int maxRetries = 12;
-				long retryDelayInMS = 100; // 100 ms
+			int maxRetries = 12;
+			long retryDelayInMS = 100;
 
-				InconsistencyFetchAPI fetchAPI = new InconsistencyFetchAPI(analyseResponse.getClientId(), maxRetries,
-						retryDelayInMS);
-				Display.getDefault().asyncExec(fetchAPI);
-			}
+			InconsistencyFetchAPI fetchAPI = new InconsistencyFetchAPI(analyseResponse.getClientId(), maxRetries, retryDelayInMS);
+			Display.getDefault().asyncExec(fetchAPI);
 		} catch (Exception exception) {
-			LOGGER.error(exception.getMessage(), exception);
+			LOGGER.error("Error analyze the active editor.", exception);
 		}
 
 		return inconsistencies;
