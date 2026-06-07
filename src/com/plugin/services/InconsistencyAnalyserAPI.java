@@ -57,7 +57,7 @@ public class InconsistencyAnalyserAPI {
         }
     }
 
-	public AnalyserResponseDTO analyseBytes(byte[] modelBytes, String filename)throws AnalyserException {
+	public AnalyserResponseDTO analyseBytes(byte[] modelBytes, String filename) throws AnalyserException {
         String url = getUrlBase();
         if (url == null || url.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
 
@@ -82,8 +82,9 @@ public class InconsistencyAnalyserAPI {
             if (statusCode < 200 || statusCode > 299) throw new AnalyserException("Server returned HTTP " + statusCode + ": " + body);
 
             return Json2Obj.deserializeObj(body, AnalyserResponseDTO.class);
-        } catch (IOException e) {
-            throw new AnalyserException("HTTP request to [" + url + "] failed.", e);
+        } catch (IOException exception) {
+        	LOGGER.error("HTTP POST request to [" + url + "] failed.", exception);
+            throw new AnalyserException("HTTP POST request to [" + url + "] failed.", exception);
         }
     }
 
