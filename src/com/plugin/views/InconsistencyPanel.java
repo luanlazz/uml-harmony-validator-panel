@@ -128,9 +128,7 @@ public class InconsistencyPanel extends ViewPart {
 	public void filterElementsByDiagramId(String diagramId) {
 		List<InconsistencyConcentrationDTO> elements = viewData.getDiagramsElements();
 
-		if (diagramId != null) {
-			elements = elements.stream().filter(e -> e.getParentId().equals(diagramId)).toList();
-		}
+		if (diagramId != null) elements = elements.stream().filter(e -> e.getParentId().equals(diagramId)).toList();
 
 		elementsConcentrationTable.fillConcentrations(elements, viewData.getDiagramStatistics());
 		updateTotalElements(elements.size());
@@ -142,10 +140,7 @@ public class InconsistencyPanel extends ViewPart {
 	public void filterInconsistenciesById(String id) {
 		List<InconsistencyErrorDTO> inconsistencies = viewData.getInconsistencies();
 
-		if (id != null) {
-			inconsistencies = inconsistencies.stream().filter(i -> i.getParentId().equals(id) || i.getElId().equals(id))
-					.toList();
-		}
+		if (id != null) inconsistencies = inconsistencies.stream().filter(i -> i.getParentId().equals(id) || i.getElId().equals(id)).toList();
 
 		inconsistenciesTable.fillInconsistencies(inconsistencies);
 		updateTotalInconsistencies(inconsistencies.size());
@@ -174,12 +169,9 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public long countInconsistenciesBySeverity(List<InconsistencyErrorDTO> inconsistencies, Severity severity) {
-		if (inconsistencies == null) {
-			return 0;
-		}
+		if (inconsistencies == null) return 0;
 
-		return inconsistencies.stream().filter(inconsistency -> inconsistency.getSeverity() == severity.getValue())
-				.count();
+		return inconsistencies.stream().filter(inconsistency -> inconsistency.getSeverity() == severity.getValue()).count();
 	}
 
 	public static Image loadImage(Display display, String fileName) {
