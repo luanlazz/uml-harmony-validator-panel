@@ -33,14 +33,6 @@ public class MessageService implements IMessageProvider {
 		return single_instance;
 	}
 
-	public void changeLocale(String locale) {
-		Locale newLocale = switch (locale) {
-			case "pt" -> new Locale("pt");
-			default -> DEFAULT_LOCALE;
-		};
-		loadResourceBundle(newLocale);
-	}
-
 	@Override
 	public String get(String key) {
 		if (key == null || key.isBlank()) return "!" + key + "!";
