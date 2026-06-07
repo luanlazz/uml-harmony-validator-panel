@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import com.plugin.i18n.MessageProvider;
+import com.plugin.i18n.MessageService;
 import com.plugin.services.dto.DiagramStatisticsDTO;
 import com.plugin.services.dto.InconsistencyConcentrationDTO;
 import com.plugin.services.dto.Severity;
@@ -22,7 +22,7 @@ import com.plugin.views.InconsistencyPanel;
 
 public class DiagramsConcentrationTable {
 
-	private MessageProvider messages;
+	private MessageService messages;
 
 	private String type;
 	private Table table = null;
@@ -32,7 +32,7 @@ public class DiagramsConcentrationTable {
 
 	public DiagramsConcentrationTable(String type) {
 		this.type = type;
-		this.messages = MessageProvider.instance();
+		this.messages = MessageService.instance();
 	}
 
 	public Table getTable() {

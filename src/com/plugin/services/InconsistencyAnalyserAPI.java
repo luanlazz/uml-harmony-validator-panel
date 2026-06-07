@@ -12,7 +12,7 @@ import java.nio.file.Files;
 
 import org.eclipse.core.resources.IFile;
 
-import com.plugin.i18n.MessageProvider;
+import com.plugin.i18n.MessageService;
 import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistenciesResponseDTO;
 import com.plugin.utils.Json2Obj;
@@ -20,11 +20,11 @@ import com.plugin.utils.Json2Obj;
 public class InconsistencyAnalyserAPI {
 
 	public static String URL_BASE = "";
-	private MessageProvider messages;
+	private MessageService messages;
 
 	public InconsistencyAnalyserAPI() {
 		getUrl();
-		this.messages = MessageProvider.instance();
+		this.messages = MessageService.instance();
 	}
 
 	public static void setUrlBase(String url) {

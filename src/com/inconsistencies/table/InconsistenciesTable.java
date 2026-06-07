@@ -12,19 +12,19 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import com.plugin.i18n.MessageProvider;
+import com.plugin.i18n.MessageService;
 import com.plugin.services.dto.InconsistencyErrorDTO;
 import com.plugin.services.dto.Severity;
 
 public class InconsistenciesTable {
 
-	private MessageProvider messages;
+	private MessageService messages;
 
 	private Table table = null;
 	private HashMap<Integer, Color> colorBySeverity = new HashMap<>();
 
 	public InconsistenciesTable() {
-		this.messages = MessageProvider.instance();
+		this.messages = MessageService.instance();
 	}
 
 	public Table getTable() {

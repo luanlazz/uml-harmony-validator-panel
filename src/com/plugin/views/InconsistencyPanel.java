@@ -17,7 +17,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.inconsistencies.concentration.table.DiagramsConcentrationTable;
 import com.inconsistencies.table.InconsistenciesTable;
-import com.plugin.i18n.MessageProvider;
+import com.plugin.i18n.MessageService;
 import com.plugin.services.InconsistencyAnalyserAPI;
 import com.plugin.services.dto.InconsistenciesResponse;
 import com.plugin.services.dto.InconsistencyConcentrationDTO;
@@ -26,7 +26,7 @@ import com.plugin.services.dto.Severity;
 
 public class InconsistencyPanel extends ViewPart {
 
-	private MessageProvider messages;
+	private MessageService messages;
 
 	private static InconsistencyPanel single_instance = null;
 
@@ -50,7 +50,7 @@ public class InconsistencyPanel extends ViewPart {
 	public InconsistencyPanel() {
 		single_instance = this;
 
-		this.messages = MessageProvider.instance();
+		this.messages = MessageService.instance();
 	}
 
 	public static InconsistencyPanel instace() {

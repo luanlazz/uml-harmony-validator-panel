@@ -6,27 +6,27 @@ import java.util.ResourceBundle;
 
 import com.plugin.utils.PluginLogger;
 
-public class MessageProvider implements IMessageProvider {
+public class MessageService implements IMessageProvider {
 
-	private static final PluginLogger LOGGER = new PluginLogger(MessageProvider.class);
+	private static final PluginLogger LOGGER = new PluginLogger(MessageService.class);
 	private static final String BUNDLE_BASE_NAME = "resources/ApplicationMessages";
 	private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
-	private static volatile MessageProvider single_instance;
+	private static volatile MessageService single_instance;
 
 	private ResourceBundle resourceBundle;
 	private Locale locale;
 
-	private MessageProvider() {
+	private MessageService() {
 		this.locale = Locale.getDefault();
 		loadResourceBundle(this.locale);
 	}
 
-	public static MessageProvider instance() {
+	public static MessageService instance() {
 		if (single_instance == null) {
-			synchronized (MessageProvider.class) {
+			synchronized (MessageService.class) {
 				if (single_instance == null) {
-					single_instance = new MessageProvider();
+					single_instance = new MessageService();
 				}
 			}
 		}
