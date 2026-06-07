@@ -67,9 +67,7 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public static InconsistencyPanel instace() {
-		if (single_instance == null) {
-			single_instance = new InconsistencyPanel();
-		}
+		if (single_instance == null) single_instance = new InconsistencyPanel();
 
 		return single_instance;
 	}
@@ -188,9 +186,8 @@ public class InconsistencyPanel extends ViewPart {
 		// Use the class loader to load the image as a resource
 		ClassLoader classLoader = InconsistencyPanel.class.getClassLoader();
 		try (InputStream inputStream = classLoader.getResourceAsStream(fileName)) {
-			if (inputStream == null) {
-				throw new IOException("Resource not found: " + fileName);
-			}
+			if (inputStream == null) throw new IOException("Resource not found: " + fileName);
+
 			return new Image(display, inputStream);
 		} catch (Exception e) {
 			System.out.println("Error to load resource: " + fileName + " - error: " + e.getMessage());
