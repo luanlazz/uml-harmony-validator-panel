@@ -18,7 +18,6 @@ import org.eclipse.ui.part.ViewPart;
 import com.inconsistencies.concentration.table.DiagramsConcentrationTable;
 import com.inconsistencies.table.InconsistenciesTable;
 import com.plugin.i18n.MessageService;
-import com.plugin.services.InconsistencyAnalyserAPI;
 import com.plugin.services.dto.InconsistenciesResponse;
 import com.plugin.services.dto.InconsistencyConcentrationDTO;
 import com.plugin.services.dto.InconsistencyErrorDTO;
@@ -27,6 +26,18 @@ import com.plugin.services.dto.Severity;
 public class InconsistencyPanel extends ViewPart {
 
 	private MessageService messageService;
+	
+	public static String VIEW_ID = "com.inconsistency.InconsistencyAnalyser";
+
+	private static int GRID_COLS = 10;
+
+	private static int SUMMARY_LABEL_FONT_SIZE = 20;
+	private static int TABLE_TITLE_FONT_SIZE = 16;
+	private static int STATUS_LABEL_FONT_SIZE = 14;
+
+	private static int DIAGRAM_TABLE_COLS = 3;
+	private static int ELEMENT_TABLE_COLS = 2;
+	private static int INCONSISTENCY_TABLE_COLS = 5;
 
 	private static InconsistencyPanel single_instance = null;
 
@@ -37,15 +48,17 @@ public class InconsistencyPanel extends ViewPart {
 	private DiagramsConcentrationTable diagramConcentrationTable = new DiagramsConcentrationTable("diagram");
 	private DiagramsConcentrationTable elementsConcentrationTable = new DiagramsConcentrationTable("elements");
 
-	Label summary = null;
+	private Label summary = null;
 
-	Label labelDiagramsTable = null;
-	Label labelElementsTable = null;
-	Label labelInconsistenciesTable = null;
+	private Label labelDiagramsTable = null;
+	private Label labelElementsTable = null;
+	private Label labelInconsistenciesTable = null;
 
-	Label labelTotalPkgs = null;
-	Label labelTotalElements = null;
-	Label labelTotalInconsistencies = null;
+	private Label labelTotalPkgs = null;
+	private Label labelTotalElements = null;
+	private Label labelTotalInconsistencies = null;
+
+	private Label statusLabel;
 
 	public InconsistencyPanel() {
 		single_instance = this;
@@ -63,28 +76,24 @@ public class InconsistencyPanel extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		int gridCols = 10;
-		parent.setLayout(new GridLayout(gridCols, true));
-		
+		parent.setLayout(new GridLayout(GRID_COLS, true));
+
 		Display display = parent.getDisplay();
 
-		setupSummaryLabel(parent, gridCols, display);
+		setupSummaryLabel(parent, display);
 
-		int diagramTableCols = 3;
-		int elementTableCols = 2;
-		int inconsistencyTableCols = 5;
+		setupDiagramTableTitleLabel(parent, display);
+		setupElementTableTitleLabel(parent, display);
+		setupInconsistencyTableTitleLabel(parent, display);
 
-		setupDiagramTableLabel(parent, display, diagramTableCols);
-		setupElementTableLabel(parent, display, elementTableCols);
-		setupInconsistencyTableLabel(parent, display, inconsistencyTableCols);
+		this.diagramConcentrationTable.initializeTable(parent, DIAGRAM_TABLE_COLS);
+		this.elementsConcentrationTable.initializeTable(parent, ELEMENT_TABLE_COLS);
+		this.inconsistenciesTable.initializeTable(parent, INCONSISTENCY_TABLE_COLS);
 
-		this.diagramConcentrationTable.initializeTable(parent, diagramTableCols);
-		this.elementsConcentrationTable.initializeTable(parent, elementTableCols);
-		this.inconsistenciesTable.initializeTable(parent, inconsistencyTableCols);
+		setupDiagramTableFooter(parent);
+		setupElementTableFooter(parent);
+		setupInconsistencyTableFooter(parent);
 
-		setupDiagramTableFooter(parent, diagramTableCols);
-		setupElementTableFooter(parent, elementTableCols);
-		setupInconsistencyTableFooter(parent, inconsistencyTableCols);
 	}
 
 	public void clearTables() {
@@ -117,7 +126,7 @@ public class InconsistencyPanel extends ViewPart {
 		String diagramId = diagrams.size() > 0 ? diagrams.get(0).getId() : null;
 		filterElementsByDiagramId(diagramId);
 	}
-	
+
 	public void filterElementsByDiagramId(String diagramId) {
 		List<InconsistencyConcentrationDTO> elements = data.getDiagramsElements();
 
@@ -193,64 +202,64 @@ public class InconsistencyPanel extends ViewPart {
 	public void setFocus() {
 		// TODO Auto-generated method stub
 	}
-	
-	private void setupSummaryLabel(Composite parent, int gridCols, Display display) {
-		this.summary = new Label(parent, PROP_TITLE);
-		GridData gridSummary = new GridData(SWT.FILL, SWT.CENTER, true, false, gridCols, 1);
+
+	private void setupSummaryLabel(Composite parent, Display display) {
+		this.summary = new Label(parent, SWT.NONE);
+		GridData gridSummary = new GridData(SWT.FILL, SWT.CENTER, true, false, GRID_COLS, 1);
 		this.summary.setLayoutData(gridSummary);
 		FontData[] fD = this.summary.getFont().getFontData();
-		fD[0].setHeight(20);
+		fD[0].setHeight(SUMMARY_LABEL_FONT_SIZE);
 		this.summary.setFont(new Font(display, fD[0]));
 		this.summary.setText(messageService.get("summary.initial"));
 	}
-	
-	private void setupDiagramTableLabel(Composite parent, Display display, int tDiagramsCols) {
-		this.labelDiagramsTable = new Label(parent, PROP_TITLE);
-		GridData gridMisinterpretation = new GridData(SWT.FILL, SWT.CENTER, true, false, tDiagramsCols, 1);
+
+	private void setupDiagramTableTitleLabel(Composite parent, Display display) {
+		this.labelDiagramsTable = new Label(parent, SWT.NONE);
+		GridData gridMisinterpretation = new GridData(SWT.FILL, SWT.CENTER, true, false, DIAGRAM_TABLE_COLS, 1);
 		this.labelDiagramsTable.setLayoutData(gridMisinterpretation);
 		FontData[] fD = this.labelDiagramsTable.getFont().getFontData();
-		fD[0].setHeight(16);
+		fD[0].setHeight(TABLE_TITLE_FONT_SIZE);
 		this.labelDiagramsTable.setFont(new Font(display, fD[0]));
 		this.labelDiagramsTable.setText(messageService.get("table.diagrams.label"));
 	}	
 
-	private void setupElementTableLabel(Composite parent, Display display, int tElementsCols) {
-		this.labelElementsTable = new Label(parent, PROP_TITLE);
-		GridData gridSpreadRate = new GridData(SWT.FILL, SWT.CENTER, true, false, tElementsCols, 1);
+	private void setupElementTableTitleLabel(Composite parent, Display display) {
+		this.labelElementsTable = new Label(parent, SWT.NONE);
+		GridData gridSpreadRate = new GridData(SWT.FILL, SWT.CENTER, true, false, ELEMENT_TABLE_COLS, 1);
 		this.labelElementsTable.setLayoutData(gridSpreadRate);
 		FontData[] fD = this.labelElementsTable.getFont().getFontData();
-		fD[0].setHeight(16);
+		fD[0].setHeight(TABLE_TITLE_FONT_SIZE);
 		this.labelElementsTable.setFont(new Font(display, fD[0]));
 		this.labelElementsTable.setText(messageService.get("table.element.label"));
 	}
 
-	private void setupInconsistencyTableLabel(Composite parent, Display display, int tInconsistenciesCols) {
-		this.labelInconsistenciesTable = new Label(parent, PROP_TITLE);
-		GridData gridConcentrationInc = new GridData(SWT.FILL, SWT.CENTER, true, false, tInconsistenciesCols, 1);
+	private void setupInconsistencyTableTitleLabel(Composite parent, Display display) {
+		this.labelInconsistenciesTable = new Label(parent, SWT.NONE);
+		GridData gridConcentrationInc = new GridData(SWT.FILL, SWT.CENTER, true, false, INCONSISTENCY_TABLE_COLS, 1);
 		this.labelInconsistenciesTable.setLayoutData(gridConcentrationInc);
 		FontData[] fD = this.labelInconsistenciesTable.getFont().getFontData();
-		fD[0].setHeight(16);
+		fD[0].setHeight(TABLE_TITLE_FONT_SIZE);
 		this.labelInconsistenciesTable.setFont(new Font(display, fD[0]));
 		this.labelInconsistenciesTable.setText(messageService.get("table.inconsistency.label"));
 	}
-	
-	private void setupDiagramTableFooter(Composite parent, int tDiagramsCols) {
-		this.labelTotalPkgs = new Label(parent, PROP_TITLE);
-		GridData gridTotalPkgs = new GridData(SWT.FILL, SWT.FILL, true, true, tDiagramsCols, 1);
+
+	private void setupDiagramTableFooter(Composite parent) {
+		this.labelTotalPkgs = new Label(parent, SWT.NONE);
+		GridData gridTotalPkgs = new GridData(SWT.FILL, SWT.FILL, true, true, DIAGRAM_TABLE_COLS, 1);
 		this.labelTotalPkgs.setLayoutData(gridTotalPkgs);
 		this.updateTotalPkgs(0);
 	}
 
-	private void setupElementTableFooter(Composite parent, int tElementsCols) {
-		this.labelTotalElements = new Label(parent, PROP_TITLE);
-		GridData gridTotalElements = new GridData(SWT.FILL, SWT.FILL, true, true, tElementsCols, 1);
+	private void setupElementTableFooter(Composite parent) {
+		this.labelTotalElements = new Label(parent, SWT.NONE);
+		GridData gridTotalElements = new GridData(SWT.FILL, SWT.FILL, true, true, ELEMENT_TABLE_COLS, 1);
 		this.labelTotalElements.setLayoutData(gridTotalElements);
 		this.updateTotalElements(0);
 	}
-	
-	private void setupInconsistencyTableFooter(Composite parent, int tInconsistenciesCols) {
-		this.labelTotalInconsistencies = new Label(parent, PROP_TITLE);
-		GridData gridTotalInconsistencies = new GridData(SWT.FILL, SWT.FILL, true, true, tInconsistenciesCols, 1);
+
+	private void setupInconsistencyTableFooter(Composite parent) {
+		this.labelTotalInconsistencies = new Label(parent, SWT.NONE);
+		GridData gridTotalInconsistencies = new GridData(SWT.FILL, SWT.FILL, true, true, INCONSISTENCY_TABLE_COLS, 1);
 		this.labelTotalInconsistencies.setLayoutData(gridTotalInconsistencies);
 		this.updateTotalInconsistencies(0);
 	}
