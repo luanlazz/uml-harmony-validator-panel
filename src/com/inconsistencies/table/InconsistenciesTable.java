@@ -24,7 +24,7 @@ public class InconsistenciesTable {
 	private HashMap<Integer, Color> colorBySeverity = new HashMap<>();
 
 	public InconsistenciesTable() {
-		this.messages = MessageProvider.instace();
+		this.messages = MessageProvider.instance();
 	}
 
 	public Table getTable() {

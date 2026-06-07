@@ -32,7 +32,7 @@ public class DiagramsConcentrationTable {
 
 	public DiagramsConcentrationTable(String type) {
 		this.type = type;
-		this.messages = MessageProvider.instace();
+		this.messages = MessageProvider.instance();
 	}
 
 	public Table getTable() {

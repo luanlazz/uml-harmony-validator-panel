@@ -9,54 +9,64 @@ import com.plugin.utils.PluginLogger;
 public class MessageProvider implements IMessageProvider {
 
 	private static final PluginLogger LOGGER = new PluginLogger(MessageProvider.class);
+	private static final String BUNDLE_BASE_NAME = "resources/ApplicationMessages";
+	private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
-	private static MessageProvider single_instance = null;
+	private static volatile MessageProvider single_instance;
 
 	private ResourceBundle resourceBundle;
 	private Locale locale;
 
-	public MessageProvider() {
-		single_instance = this;
+	private MessageProvider() {
 		this.locale = Locale.getDefault();
-		setResourceBundle();
+		loadResourceBundle(this.locale);
 	}
 
-	public static MessageProvider instace() {
+	public static MessageProvider instance() {
 		if (single_instance == null) {
-			single_instance = new MessageProvider();
+			synchronized (MessageProvider.class) {
+				if (single_instance == null) {
+					single_instance = new MessageProvider();
+				}
+			}
 		}
-
 		return single_instance;
 	}
 
 	public void changeLocale(String locale) {
-		switch (locale) {
-		case "pt": {
-			this.locale = new Locale("pt");
-			break;
-		}
-		default:
-			this.locale = Locale.getDefault();
-		}
-
-		setResourceBundle();
+		Locale newLocale = switch (locale) {
+			case "pt" -> new Locale("pt");
+			default -> DEFAULT_LOCALE;
+		};
+		loadResourceBundle(newLocale);
 	}
 
 	@Override
 	public String get(String key) {
-		return resourceBundle.getString(key);
+		if (key == null || key.isBlank()) return "!" + key + "!";
+
+		try {
+			return resourceBundle.getString(key);
+		} catch (MissingResourceException exception) {
+			LOGGER.warn("Missing message key: [" + key + "]", exception);
+			return key;
+		}
 	}
 
 	public Locale getLocale() {
 		return this.locale;
 	}
 
-	private void setResourceBundle() {
+	private void loadResourceBundle(Locale targetLocale) {
 		try {
-			resourceBundle = ResourceBundle.getBundle("resources/ApplicationMessages", this.locale);
+			this.resourceBundle = ResourceBundle.getBundle(BUNDLE_BASE_NAME, targetLocale);
+			this.locale = targetLocale;
 		} catch (MissingResourceException exception) {
-			LOGGER.error("Failed to load resource bundle [locale: " + this.locale + "].", exception);
-			changeLocale("en");
+			LOGGER.error("Failed to load resource bundle [locale: " + targetLocale + "].", exception);
+			if (!targetLocale.equals(DEFAULT_LOCALE)) {
+				LOGGER.warn("Falling back to default locale: " + DEFAULT_LOCALE, exception);
+				loadResourceBundle(DEFAULT_LOCALE);
+			}
 		}
 	}
 }

@@ -24,7 +24,7 @@ public class InconsistencyAnalyserAPI {
 
 	public InconsistencyAnalyserAPI() {
 		getUrl();
-		this.messages = MessageProvider.instace();
+		this.messages = MessageProvider.instance();
 	}
 
 	public static void setUrlBase(String url) {

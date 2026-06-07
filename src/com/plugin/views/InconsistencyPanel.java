@@ -50,7 +50,7 @@ public class InconsistencyPanel extends ViewPart {
 	public InconsistencyPanel() {
 		single_instance = this;
 
-		this.messages = MessageProvider.instace();
+		this.messages = MessageProvider.instance();
 	}
 
 	public static InconsistencyPanel instace() {
