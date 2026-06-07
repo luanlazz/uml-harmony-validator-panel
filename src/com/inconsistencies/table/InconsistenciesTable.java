@@ -18,13 +18,13 @@ import com.plugin.services.dto.Severity;
 
 public class InconsistenciesTable {
 
-	private MessageService messages;
+	private MessageService messageService;
 
 	private Table table = null;
 	private HashMap<Integer, Color> colorBySeverity = new HashMap<>();
 
 	public InconsistenciesTable() {
-		this.messages = MessageService.instance();
+		this.messageService = MessageService.instance();
 	}
 
 	public Table getTable() {
@@ -56,10 +56,10 @@ public class InconsistenciesTable {
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 
-		String[] tHead = { this.messages.get("table.inconsistency.head.concentration"),
-				this.messages.get("table.inconsistency.head.inconsistency"),
-				this.messages.get("table.inconsistency.head.description"),
-				this.messages.get("table.inconsistency.head.consistency.rule") };
+		String[] tHead = { this.messageService.get("table.inconsistency.head.concentration"),
+				this.messageService.get("table.inconsistency.head.inconsistency"),
+				this.messageService.get("table.inconsistency.head.description"),
+				this.messageService.get("table.inconsistency.head.consistency.rule") };
 
 		for (int i = 0; i < tHead.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);

@@ -22,7 +22,7 @@ import com.plugin.views.InconsistencyPanel;
 
 public class DiagramsConcentrationTable {
 
-	private MessageService messages;
+	private MessageService messageService;
 
 	private String type;
 	private Table table = null;
@@ -32,7 +32,7 @@ public class DiagramsConcentrationTable {
 
 	public DiagramsConcentrationTable(String type) {
 		this.type = type;
-		this.messages = MessageService.instance();
+		this.messageService = MessageService.instance();
 	}
 
 	public Table getTable() {
@@ -67,11 +67,11 @@ public class DiagramsConcentrationTable {
 		List<String> tHead = new ArrayList<String>();
 
 		if (type.equals("diagram")) {
-			tHead.addAll(Arrays.asList(this.messages.get("table.diagram.head.diagram"),
-					this.messages.get("table.diagram.head.inconsistency.count"),
-					this.messages.get("table.diagram.head.concentration"),
-					this.messages.get("table.diagram.head.risk.misinterpretation"),
-					this.messages.get("table.diagram.head.inconsistency.spread.rate")));
+			tHead.addAll(Arrays.asList(this.messageService.get("table.diagram.head.diagram"),
+					this.messageService.get("table.diagram.head.inconsistency.count"),
+					this.messageService.get("table.diagram.head.concentration"),
+					this.messageService.get("table.diagram.head.risk.misinterpretation"),
+					this.messageService.get("table.diagram.head.inconsistency.spread.rate")));
 
 			table.addListener(SWT.Selection, event -> {
 				TableItem item = (TableItem) event.item;
@@ -80,9 +80,9 @@ public class DiagramsConcentrationTable {
 				InconsistencyPanel.instace().filterElementsByDiagramId(concentration.getId());
 			});
 		} else {
-			tHead.addAll(Arrays.asList(this.messages.get("table.element.head.element"),
-					this.messages.get("table.element.head.inconsistency.count"),
-					this.messages.get("table.element.head.concentration")));
+			tHead.addAll(Arrays.asList(this.messageService.get("table.element.head.element"),
+					this.messageService.get("table.element.head.inconsistency.count"),
+					this.messageService.get("table.element.head.concentration")));
 
 			table.addListener(SWT.Selection, event -> {
 				TableItem item = (TableItem) event.item;

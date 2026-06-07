@@ -26,7 +26,7 @@ import com.plugin.services.dto.Severity;
 
 public class InconsistencyPanel extends ViewPart {
 
-	private MessageService messages;
+	private MessageService messageService;
 
 	private static InconsistencyPanel single_instance = null;
 
@@ -50,7 +50,7 @@ public class InconsistencyPanel extends ViewPart {
 	public InconsistencyPanel() {
 		single_instance = this;
 
-		this.messages = MessageService.instance();
+		this.messageService = MessageService.instance();
 	}
 
 	public static InconsistencyPanel instace() {
@@ -145,22 +145,22 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void updateTotalPkgs(int num) {
-		this.labelTotalPkgs.setText(String.format(messages.get("table.model.footer"), num));
+		this.labelTotalPkgs.setText(String.format(messageService.get("table.model.footer"), num));
 	}
 
 	public void updateTotalElements(int num) {
-		this.labelTotalElements.setText(String.format(messages.get("table.element.footer"), num));
+		this.labelTotalElements.setText(String.format(messageService.get("table.element.footer"), num));
 	}
 
 	public void updateTotalInconsistencies(int num) {
-		this.labelTotalInconsistencies.setText(String.format(messages.get("table.inconsistency.footer"), num));
+		this.labelTotalInconsistencies.setText(String.format(messageService.get("table.inconsistency.footer"), num));
 	}
 
 	public void updateSummary(int num) {
 		if (num > 0) {
-			this.summary.setText(String.format(messages.get("summary.model.inconsistent"), num));
+			this.summary.setText(String.format(messageService.get("summary.model.inconsistent"), num));
 		} else {
-			this.summary.setText(messages.get("summary.model.consistent"));
+			this.summary.setText(messageService.get("summary.model.consistent"));
 		}
 
 		this.summary.pack();
@@ -201,7 +201,7 @@ public class InconsistencyPanel extends ViewPart {
 		FontData[] fD = this.summary.getFont().getFontData();
 		fD[0].setHeight(20);
 		this.summary.setFont(new Font(display, fD[0]));
-		this.summary.setText(messages.get("summary.initial"));
+		this.summary.setText(messageService.get("summary.initial"));
 	}
 	
 	private void setupDiagramTableLabel(Composite parent, Display display, int tDiagramsCols) {
@@ -211,7 +211,7 @@ public class InconsistencyPanel extends ViewPart {
 		FontData[] fD = this.labelDiagramsTable.getFont().getFontData();
 		fD[0].setHeight(16);
 		this.labelDiagramsTable.setFont(new Font(display, fD[0]));
-		this.labelDiagramsTable.setText(messages.get("table.diagrams.label"));
+		this.labelDiagramsTable.setText(messageService.get("table.diagrams.label"));
 	}	
 
 	private void setupElementTableLabel(Composite parent, Display display, int tElementsCols) {
@@ -221,7 +221,7 @@ public class InconsistencyPanel extends ViewPart {
 		FontData[] fD = this.labelElementsTable.getFont().getFontData();
 		fD[0].setHeight(16);
 		this.labelElementsTable.setFont(new Font(display, fD[0]));
-		this.labelElementsTable.setText(messages.get("table.element.label"));
+		this.labelElementsTable.setText(messageService.get("table.element.label"));
 	}
 
 	private void setupInconsistencyTableLabel(Composite parent, Display display, int tInconsistenciesCols) {
@@ -231,7 +231,7 @@ public class InconsistencyPanel extends ViewPart {
 		FontData[] fD = this.labelInconsistenciesTable.getFont().getFontData();
 		fD[0].setHeight(16);
 		this.labelInconsistenciesTable.setFont(new Font(display, fD[0]));
-		this.labelInconsistenciesTable.setText(messages.get("table.inconsistency.label"));
+		this.labelInconsistenciesTable.setText(messageService.get("table.inconsistency.label"));
 	}
 	
 	private void setupDiagramTableFooter(Composite parent, int tDiagramsCols) {

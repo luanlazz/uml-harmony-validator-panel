@@ -20,11 +20,11 @@ import com.plugin.utils.Json2Obj;
 public class InconsistencyAnalyserAPI {
 
 	public static String URL_BASE = "";
-	private MessageService messages;
+	private MessageService messageService;
 
 	public InconsistencyAnalyserAPI() {
 		getUrl();
-		this.messages = MessageService.instance();
+		this.messageService = MessageService.instance();
 	}
 
 	public static void setUrlBase(String url) {
@@ -50,7 +50,7 @@ public class InconsistencyAnalyserAPI {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-			connection.setRequestProperty("Accept-Language", this.messages.getLocale().toString());
+			connection.setRequestProperty("Accept-Language", this.messageService.getLocale().toString());
 
 			OutputStream output = connection.getOutputStream();
 			PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
@@ -111,7 +111,7 @@ public class InconsistencyAnalyserAPI {
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept-Language", this.messages.getLocale().toString());
+			connection.setRequestProperty("Accept-Language", this.messageService.getLocale().toString());
 			connection.setConnectTimeout(5000);
 			connection.setReadTimeout(5000);
 
