@@ -31,9 +31,12 @@ import com.plugin.services.InconsistencyAnalyserAPI;
 import com.plugin.services.InconsistencyFetchAPI;
 import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistencyErrorDTO;
+import com.plugin.utils.PluginLogger;
 import com.plugin.views.InconsistencyPanel;
 
 public class AnalyseInconsistenciesHandler extends AbstractHandler {
+
+	private static final PluginLogger LOGGER = new PluginLogger(AnalyseInconsistenciesHandler.class);
 
 	private InconsistencyAnalyserAPI analyserService = new InconsistencyAnalyserAPI();
 
@@ -59,8 +62,8 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 						retryDelayInMS);
 				Display.getDefault().asyncExec(fetchAPI);
 			}
-		} catch (Exception e) {
-			logWarning(e.getMessage(), e);
+		} catch (Exception exception) {
+			LOGGER.error(exception.getMessage(), exception);
 		}
 
 		return inconsistencies;
@@ -100,8 +103,8 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 			String fileName = umlResource.getURI().lastSegment();
 
 			return new ModelSnapshotAdapter(bytes, fileName);
-		} catch (Exception e) {
-			logWarning("In-memory serialisation failed; falling back to file.", e);
+		} catch (Exception exception) {
+			LOGGER.warn("In-memory serialisation failed; falling back to file.", exception);
 			return null;
 		}
 	}
@@ -140,8 +143,8 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 		} catch (NoSuchMethodException ignored) {
 			// Editor doesn't expose an editing domain — file fallback will handle it
-		} catch (Exception e) {
-			logWarning("Reflection-based domain lookup failed.", e);
+		} catch (Exception exception) {
+			LOGGER.warn("Reflection-based domain lookup failed.", exception);
 		}
 
 		return null;
@@ -209,10 +212,5 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		if (activeEditor != null) return activeEditor;
 
 		throw new ExecutionException("Open a UML model file first!");
-	}
-
-	private void logWarning(String message, Exception e) {
-		System.err.println("[AnalyserHandler] " + message);
-		if (e != null) e.printStackTrace();
 	}
 }
