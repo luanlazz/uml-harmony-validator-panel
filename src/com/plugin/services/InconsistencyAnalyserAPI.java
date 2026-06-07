@@ -19,7 +19,7 @@ import org.apache.http.util.EntityUtils;
 import org.eclipse.core.resources.IFile;
 
 import com.plugin.exceptions.AnalyserException;
-import com.plugin.i18n.MessageProvider;
+import com.plugin.i18n.MessageService;
 import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistenciesResponseDTO;
 import com.plugin.utils.Json2Obj;
@@ -29,10 +29,10 @@ public class InconsistencyAnalyserAPI {
     private static final String PREF_KEY_BASE_URL = "base_url";
     private static final ContentType UML_CONTENT_TYPE = ContentType.create("application/xml", "UTF-8");
     
-	private MessageProvider messages;
+	private MessageService messageService;
 
 	public InconsistencyAnalyserAPI() {
-		this.messages = MessageProvider.instace();
+		this.messageService = MessageService.instance();
 	}
 	
 	public static void setUrlBase(String url) {
@@ -71,7 +71,7 @@ public class InconsistencyAnalyserAPI {
 
         HttpPost request = new HttpPost(url);
         request.setEntity(multipart);
-        request.setHeader("Accept-Language", messages.getLocale().toString());
+        request.setHeader("Accept-Language", messageService.getLocale().toString());
 
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse resp = client.execute(request)) {
@@ -96,7 +96,7 @@ public class InconsistencyAnalyserAPI {
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept-Language", this.messages.getLocale().toString());
+			connection.setRequestProperty("Accept-Language", this.messageService.getLocale().toString());
 			connection.setConnectTimeout(5000);
 			connection.setReadTimeout(5000);
 
