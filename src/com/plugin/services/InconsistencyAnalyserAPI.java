@@ -1,15 +1,12 @@
 package com.plugin.services;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Files;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -23,8 +20,11 @@ import com.plugin.i18n.MessageService;
 import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistenciesResponseDTO;
 import com.plugin.utils.Json2Obj;
+import com.plugin.utils.PluginLogger;
 
 public class InconsistencyAnalyserAPI {
+
+	private static final PluginLogger LOGGER = new PluginLogger(InconsistencyAnalyserAPI.class);
 
     private static final String PREF_KEY_BASE_URL = "base_url";
     private static final ContentType UML_CONTENT_TYPE = ContentType.create("application/xml", "UTF-8");
@@ -87,43 +87,26 @@ public class InconsistencyAnalyserAPI {
         }
     }
 
-	public InconsistenciesResponseDTO getInconsistenciesByClientId(String clientId) {
-		HttpURLConnection connection = null;
+	public InconsistenciesResponseDTO getInconsistenciesByClientId(String clientId) throws AnalyserException {
+	    String urlBase = getUrlBase();
+	    if (urlBase == null || urlBase.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
 
-		try {
-			String urlWithClient = getUrlBase() + "/" + clientId;
-			URL url = new URL(urlWithClient);
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept-Language", this.messageService.getLocale().toString());
-			connection.setConnectTimeout(5000);
-			connection.setReadTimeout(5000);
+	    String url = urlBase + "/" + clientId;
+	    HttpGet request = new HttpGet(url);
+	    request.setHeader("Accept-Language", messageService.getLocale().toString());
 
-			int responseCode = connection.getResponseCode();
+	    try (CloseableHttpClient client = HttpClients.createDefault();
+	         CloseableHttpResponse resp = client.execute(request)) {
 
-			StringBuilder sb = new StringBuilder();
-			BufferedReader br = null;
-			if (responseCode >= 200 && responseCode <= 299) {
-				br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			} else {
-				br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-			}
+	        int statusCode = resp.getStatusLine().getStatusCode();
+	        String body = EntityUtils.toString(resp.getEntity(), "UTF-8");
 
-			String strCurrentLine;
-			while ((strCurrentLine = br.readLine()) != null) {
-				sb.append(strCurrentLine);
-			}
+	        if (statusCode < 200 || statusCode > 299) throw new AnalyserException("Server returned HTTP " + statusCode + ": " + body);
 
-			return Json2Obj.deserializeObj(sb.toString(), InconsistenciesResponseDTO.class);
-		} catch (Exception e) {
-			System.out.println("getInconsistenciesByClientId exception:" + e.toString());
-		} finally {
-			if (connection != null) {
-				connection.disconnect();
-			}
-		}
-
-		return new InconsistenciesResponseDTO();
+	        return Json2Obj.deserializeObj(body, InconsistenciesResponseDTO.class);
+	    } catch (IOException exception) {
+	        LOGGER.error("HTTP GET request to [" + url + "] failed.", exception);
+	        throw new AnalyserException("HTTP GET request to [" + url + "] failed.", exception);
+	    }
 	}
 }
