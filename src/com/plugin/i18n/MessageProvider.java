@@ -4,7 +4,11 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import com.plugin.utils.PluginLogger;
+
 public class MessageProvider implements IMessageProvider {
+
+	private static final PluginLogger LOGGER = new PluginLogger(MessageProvider.class);
 
 	private static MessageProvider single_instance = null;
 
@@ -50,8 +54,8 @@ public class MessageProvider implements IMessageProvider {
 	private void setResourceBundle() {
 		try {
 			resourceBundle = ResourceBundle.getBundle("resources/ApplicationMessages", this.locale);
-		} catch (MissingResourceException e) {
-			System.out.println(resourceBundle.getString("message.tryAgain"));
+		} catch (MissingResourceException exception) {
+			LOGGER.error("Failed to load resource bundle [locale: " + this.locale + "].", exception);
 			changeLocale("en");
 		}
 	}
