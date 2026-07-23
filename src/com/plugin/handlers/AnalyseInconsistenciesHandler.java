@@ -73,10 +73,13 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 			InconsistencyFetchAPI fetchAPI = new InconsistencyFetchAPI(analyseResponse.getClientId(), maxRetries, retryDelayInMS);
 			Display.getDefault().asyncExec(fetchAPI);
+			
+			updateStatus(messageService.get("status.analysis.complete"), true);
 		} catch (ExecutionException exception) {
 			showInformationDialog(exception.getMessage());
 		} catch (Exception exception) {
 			LOGGER.error("Error analyze the active editor.", exception);
+			updateStatus(messageService.get("status.analysis.failed"), true);
 		}
 
 		return inconsistencies;
