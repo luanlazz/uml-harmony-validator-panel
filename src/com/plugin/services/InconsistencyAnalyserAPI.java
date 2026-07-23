@@ -59,7 +59,7 @@ public class InconsistencyAnalyserAPI {
 
 	public AnalyserResponseDTO analyseBytes(byte[] modelBytes, String filename) throws AnalyserException {
         String url = getUrlBase();
-        if (url == null || url.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
+        if (url == null || url.isBlank()) throw new AnalyserException(this.messageService.get("validation.service.url.not.configured"));
 
         HttpEntity multipart = MultipartEntityBuilder.create()
                 .addBinaryBody(
@@ -90,7 +90,7 @@ public class InconsistencyAnalyserAPI {
 
 	public InconsistenciesResponseDTO getInconsistenciesByClientId(String clientId) throws AnalyserException {
 	    String urlBase = getUrlBase();
-	    if (urlBase == null || urlBase.isBlank()) throw new AnalyserException("Service URL is not configured. Set it via menu > settings.");
+	    if (urlBase == null || urlBase.isBlank()) throw new AnalyserException(this.messageService.get("validation.service.url.not.configured"));
 
 	    String url = urlBase + "/" + clientId;
 	    HttpGet request = new HttpGet(url);

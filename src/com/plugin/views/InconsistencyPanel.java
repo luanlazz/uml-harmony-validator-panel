@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -92,6 +93,7 @@ public class InconsistencyPanel extends ViewPart {
 		setupElementTableFooter(parent);
 		setupInconsistencyTableFooter(parent);
 
+		setupStatusLabel(parent, display);
 	}
 
 	public void clearTables() {
@@ -187,9 +189,27 @@ public class InconsistencyPanel extends ViewPart {
 		}
 	}
 
+	public void setStatus(String message, boolean isError) {
+		Display.getDefault().asyncExec(() -> {
+			if (this.statusLabel == null) return;
+			if (this.statusLabel.isDisposed()) return;
+
+			this.statusLabel.setText(message);
+
+			int messageColor = isError ? SWT.COLOR_RED : SWT.COLOR_DARK_GREEN;
+			this.statusLabel.setForeground(statusLabel.getDisplay().getSystemColor(messageColor));
+		});
+	}
+
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
+		this.statusLabel.setFocus();
+	}
+	
+	public void showInformationDialog(String message) {
+		Display.getDefault().asyncExec(() -> {		    
+		    MessageDialog.openInformation(Display.getDefault().getActiveShell(), "UML Harmony Validator", message);
+		});		
 	}
 
 	private void setupSummaryLabel(Composite parent, Display display) {
@@ -251,5 +271,15 @@ public class InconsistencyPanel extends ViewPart {
 		GridData gridTotalInconsistencies = new GridData(SWT.FILL, SWT.FILL, true, true, INCONSISTENCY_TABLE_COLS, 1);
 		this.labelTotalInconsistencies.setLayoutData(gridTotalInconsistencies);
 		this.updateTotalInconsistencies(0);
+	}
+
+	private void setupStatusLabel(Composite parent, Display display) {
+		this.statusLabel = new Label(parent, SWT.NONE);
+		GridData gridStatusLabel = new GridData(SWT.FILL, SWT.CENTER, true, false, GRID_COLS, 1);
+		this.statusLabel.setLayoutData(gridStatusLabel);
+		FontData[] fD = this.statusLabel.getFont().getFontData();
+		fD[0].setHeight(STATUS_LABEL_FONT_SIZE);
+		this.statusLabel.setFont(new Font(display, fD[0]));
+		this.statusLabel.setText("");
 	}
 }
