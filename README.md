@@ -12,9 +12,9 @@ It connects to a remote validation [service](https://github.com/luanlazz/uml-har
     - [Option 2 – Build from Source (manual)](#option-2--build-from-source-manual)
   - [🧩 Configuration](#-configuration)
   - [🔎 Usage](#-usage)
-  - [🧪 Example Workflow](#-example-workflow)
   - [📄 License](#-license)
   - [🤝 Related Projects](#-related-projects)
+  - [Supported Inconsistency Types](#supported-inconsistency-types)
 
 ## 🧭 Overview
 
@@ -133,13 +133,24 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 > [!NOTE]
 > Internet or local network access is required to reach the configured service URL.
 
-## 🧪 Example Workflow
-
-1. Configure the service URL (e.g., `http://localhost:8080/kafka`).
-2. Open a UML model in your project.
-3. Select **Analyze Model** from the plug-in menu.
-4. Review the analysis results:
-   * **Errors/Warnings** listed in the **Plug-in View**.
+## Supported Inconsistency Types
+ 
+| Code | Name / Description | Formal Definition | CR | Diagrams |
+| ---- | ------------------ | ----------------- | -- | -------- |
+| **Cm** | **Class Multiplicity**<br>Multiple definitions of classes with the same name. | `IF not classUniqueName THEN Cm inconsistency` | UML | CD |
+| **Om** | **Object Multiplicity**<br>Multiple definitions of objects with the same name. | `IF not lifelineUniqueName THEN Om inconsistency` | UML | SD |
+| **CnSD** | **Class not in Sequence Diagram**<br>Class not instantiated in the Sequence Diagram. | `IF not R115 THEN CnSD inconsistency` | R115 | CD, SD |
+| **CnCD** | **Class not in Class Diagram**<br>Object without an associated class in the Class Diagram. | `IF not classExists THEN CnCD inconsistency` | UML | SD, CD |
+| **ED** | **Erroneous Direction**<br>Message sent in the wrong direction. | `IF not R110 and messageBelongSender THEN ED inconsistency` | R110 | SD, CD |
+| **EnM** | **Element without Method**<br>Message without a corresponding method. | `IF not R110 THEN EnM inconsistency` | R110 | SD, CD |
+| **EnN** | **Element without Name**<br>Message without a name. | `IF not messageName THEN EnN inconsistency` | UML | SD |
+| **MnSD** | **Method not in Sequence Diagram**<br>Method defined in the Class Diagram but not called in the Sequence Diagram. | `IF not R114 THEN MnSD inconsistency` | R114 | CD, SD |
+| **ACSD** | **Abstract Class in Sequence Diagram**<br>Abstract class instantiated in the Sequence Diagram. | `IF not R108 THEN ACSD inconsistency` | R108 | CD, SD |
+| **CnoM** | **Class without Methods**<br>Class without any defined methods. | `IF not classHasMethod THEN CnoM inconsistency` | UML | CD |
+| **OnN** | **Object without Name**<br>Object without a name. | `IF not objectName THEN OnN inconsistency` | UML | SD |
+| **EpM** | **Element with Private Method**<br>Message calling a private method in the Class Diagram. | `IF not R116 THEN EpM inconsistency` | R116 | SD, CD |
+ 
+> **CD** = Class Diagram · **SD** = Sequence Diagram · **CR** = Consistency Rule
   
 ## 📄 License
 
