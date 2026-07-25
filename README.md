@@ -30,7 +30,7 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 ## Features
  
 * Validate UML models (Class and Sequence Diagrams) directly within Eclipse.
-* Detect multiple types of inconsistencies (e.g., class duplication, abstract instantiation, missing methods).
+* Detect multiple types of inconsistencies, described in [Supported Inconsistency Types](#supported-inconsistency-types).
 * Configure service endpoint through the settings dialog.
 * Lightweight integration with existing EMF-based projects.
 
@@ -72,18 +72,21 @@ This plug-in provides an integrated workflow for model validation within Eclipse
    * Finish the export to generate the `.jar` file.
 6. Copy the exported `.jar` into your Eclipse **`dropins/`** directory.
    > If the `dropins/` folder does not exist, create it in the Eclipse root directory.
-7. Restart Eclipse to activate the plug-in.
+7. Open/Restart Eclipse to activate the plug-in.
+
 > [!TIP]
 > Confirm the installation by going to **Window > Show View > Other...** and searching for **UML Harmony Validator Panel**.
 
 ## Configuration
  
 1. Open the panel by navigating to **Window > Show View > Other...**, then searching for **UML Harmony Validator Panel** and double-clicking to add it to your workspace.
-   ![Papyrus show view](images/papyrus_show_view.png)
+  
+  ![Papyrus show view](images/papyrus_show_view.png)
 
 2. Open **UML Harmony Validator > Plug-in Settings** from the menu.
-   ![Plug-in menu](images/plug_in_menu_settings.png)
-   ![Plug-in settings](images/plug_in_settings.png)
+  
+  ![Plug-in menu](images/plug_in_menu_settings.png)
+  ![Plug-in settings](images/plug_in_settings.png)
 
 3. Set the **Service URL** to point to the backend validator service, for example:
 ```
@@ -96,23 +99,23 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 > The plug-in stores these settings in Eclipse preferences for persistent use between sessions.
 
 ## Usage
- 
-1. Open any UML project in your Eclipse workspace.
-   ![Papyrus workspace](images/papyrus_workspace_1.png)
 
-2. Open the UML model view (`.uml` file). The analysis works on the active UML view.
-   ![UML File](images/papyrus_workspace_2.png)
+1. Open your UML project (1) in the Eclipse workspace and navigate to the UML model view. In the plug-in (2), trigger the analysis (3) via the shortcut icon or navigate to **Menu > Analyze Model**.
 
-3. With the UML model view open, trigger the analysis via the shortcut icon in the plug-in panel or navigate to **Menu > Analyze Model**.
-   ![Analyze model action](images/papyrus_workspace_3.png)
+   ![Analyze model](images/use_1.png)
 
-4. The plug-in sends the model to the configured backend service and displays the inconsistency results in the panel once the analysis completes.
-   ![Inconsistency results](images/papyrus_workspace_4.png)
+2. Once the analysis completes, results are displayed in the panel with a summary of total inconsistencies found (1), organized by diagrams (2), their elements (3), and the inconsistencies per element (4).
 
-5. Navigate between results — diagram and element boxes are interactive. Click a **diagram** to display its **elements**, then click an **element** to view its **inconsistencies**.
-   ![Sequence diagram](images/papyrus_workspace_5.png)
-   ![Class diagram](images/papyrus_workspace_6.png)
-   
+   ![Analysis result](images/use_2.png)
+
+3. The panel is interactive, click a **diagram** (1) to list its **elements**, then click an **element** (2) to view its **inconsistencies** (3).
+
+   ![Navigate](images/use_3.png)
+
+4. When the **model has no inconsistencies**, the panel is cleared automatically.
+
+   ![Consistent](images/use_4.png)
+
 > [!NOTE]
 > Internet or local network access is required to reach the configured service URL.
 
