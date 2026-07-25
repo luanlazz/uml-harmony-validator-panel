@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
@@ -189,15 +190,19 @@ public class InconsistencyPanel extends ViewPart {
 		}
 	}
 
-	public void setStatus(String message, boolean isError) {
+	public void setStatus(String message, StatusType type) {
 		Display.getDefault().asyncExec(() -> {
 			if (this.statusLabel == null) return;
 			if (this.statusLabel.isDisposed()) return;
 
+			Color color = switch (type) {
+	        	case SUCCESS -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN);
+	        	case INFO -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
+	        	case ERROR -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
+			};
+			
+			this.statusLabel.setForeground(color);
 			this.statusLabel.setText(message);
-
-			int messageColor = isError ? SWT.COLOR_RED : SWT.COLOR_DARK_GREEN;
-			this.statusLabel.setForeground(statusLabel.getDisplay().getSystemColor(messageColor));
 		});
 	}
 

@@ -38,6 +38,7 @@ import com.plugin.utils.PluginLogger;
 import com.plugin.utils.ValidationError;
 import com.plugin.validator.ModelAnalyzeValidator;
 import com.plugin.views.InconsistencyPanel;
+import com.plugin.views.StatusType;
 
 public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
@@ -74,25 +75,25 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 			InconsistencyFetchAPI fetchAPI = new InconsistencyFetchAPI(analyseResponse.getClientId(), maxRetries, retryDelayInMS);
 			Display.getDefault().asyncExec(fetchAPI);
 			
-			updateStatus(messageService.get("status.analysis.complete"), true);
+			updateStatus(messageService.get("status.analysis.complete"), StatusType.SUCCESS);
 		} catch (ExecutionException exception) {
 			showInformationDialog(exception.getMessage());
 		} catch (Exception exception) {
 			LOGGER.error("Error analyze the active editor.", exception);
-			updateStatus(messageService.get("status.analysis.failed"), true);
+			updateStatus(messageService.get("status.analysis.failed"), StatusType.ERROR);
 		}
 
 		return inconsistencies;
 	}
 
-	public void updateStatus(String message, boolean isError) {
+	public void updateStatus(String message, StatusType type) {
 		Display.getDefault().asyncExec(() -> {
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			IViewPart view = page.findView(InconsistencyPanel.VIEW_ID);
 
 			if (view == null) return;
 
-			((InconsistencyPanel) view).setStatus(message, isError);
+			((InconsistencyPanel) view).setStatus(message, type);
 		});
 	}
 
