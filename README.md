@@ -4,19 +4,19 @@ The **UML Harmony Validator Plug-in** extends the **Eclipse Modeling Framework (
 It connects to a remote validation [service](https://github.com/luanlazz/uml-harmony-validator-service?tab=readme-ov-file#uml-harmony-validator-server---detection-of-inconsistencies) to detect **inconsistencies** in UML Class and Sequence Diagrams.
 
 - [UML Harmony Validator – Eclipse Plug-in](#uml-harmony-validator--eclipse-plug-in)
-  - [🧭 Overview](#-overview)
-  - [🏗️ Features](#️-features)
-  - [⚙️ Architecture](#️-architecture)
-  - [🚀 Installation](#-installation)
+  - [Overview](#overview)
+  - [Features](#features)
+  - [Architecture](#architecture)
+  - [Installation](#installation)
     - [Option 1 – Download Prebuilt JAR (recommended)](#option-1--download-prebuilt-jar-recommended)
     - [Option 2 – Build from Source (manual)](#option-2--build-from-source-manual)
-  - [🧩 Configuration](#-configuration)
-  - [🔎 Usage](#-usage)
-  - [📄 License](#-license)
-  - [🤝 Related Projects](#-related-projects)
+  - [Configuration](#configuration)
+  - [Usage](#usage)
   - [Supported Inconsistency Types](#supported-inconsistency-types)
+  - [License](#license)
+  - [Related Projects](#related-projects)
 
-## 🧭 Overview
+## Overview
 
 This plug-in provides an integrated workflow for model validation within Eclipse:
 
@@ -27,109 +27,92 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 
 > The plug-in communicates with the [UML Harmony Validator Service](https://github.com/luanlazz/uml-harmony-validator-service?tab=readme-ov-file#uml-harmony-validator-server---detection-of-inconsistencies) to perform the actual analysis.
 
-## 🏗️ Features
-
+## Features
+ 
 * Validate UML models (Class and Sequence Diagrams) directly within Eclipse.
 * Detect multiple types of inconsistencies (e.g., class duplication, abstract instantiation, missing methods).
 * Configure service endpoint through the settings dialog.
 * Lightweight integration with existing EMF-based projects.
 
-## ⚙️ Architecture
-
+## Architecture
+ 
 * **Platform:** Eclipse (EMF-based plug-in)
-* **Backend Communication:** REST API
+* **Backend Communication:** REST API with SSE (Server-Sent Events) for real-time result delivery
 * **Core Technologies:**
   * Eclipse Plug-in Development Environment (PDE)
   * EMF (Eclipse Modeling Framework)
   * Java 17+
 * **External Dependency:** UML Harmony Validator Service (backend analyzer)
 
-## 🚀 Installation
+## Installation
 
 ### Option 1 – Download Prebuilt JAR (recommended)
 
 1. Go to the [Releases](../../releases) page of this repository.
 2. Download the latest `uml-harmony-validator-plugin-<version>.jar` file.
 3. Copy the downloaded `.jar` into your Eclipse **`dropins/`** folder.
+   > If the `dropins/` folder does not exist, create it in the Eclipse root directory.
+4. Open/Restart Eclipse IDE. The plug-in should load automatically.
 
-   > 💡 If the `dropins/` folder does not exist, create it yourself in the Eclipse root directory.
-4. Restart Eclipse. The plug-in should load automatically.
 
 ### Option 2 – Build from Source (manual)
-
+ 
 1. Clone this repository:
-
-   ```bash
+```bash
    gh repo clone luanlazz/uml-harmony-validator-plugin
    cd uml-harmony-validator-plugin
-   ```
+```
 2. Open **Eclipse IDE for RCP and RAP Developers**.
-3. Go to **File ▸ Import ▸ Existing Projects into Workspace**, and select the cloned folder.
+3. Go to **File > Import > Existing Projects into Workspace**, and select the cloned folder.
 4. Once imported, open the **plugin.xml** file to verify that dependencies are resolved.
 5. Export the plug-in:
-
-   * Go to **File ▸ Export ▸ Plug-in Development ▸ Deployable plug-ins and fragments**.
+   * Go to **File > Export > Plug-in Development > Deployable plug-ins and fragments**.
    * Select the **UML Harmony Validator** project.
    * Choose a **destination directory** (e.g., `export/` folder).
    * Finish the export to generate the `.jar` file.
 6. Copy the exported `.jar` into your Eclipse **`dropins/`** directory.
-
-   > 💡 If the `dropins/` folder does not exist, create it yourself in the Eclipse root directory.
+   > If the `dropins/` folder does not exist, create it in the Eclipse root directory.
 7. Restart Eclipse to activate the plug-in.
-
 > [!TIP]
-> You can confirm the installation by opening Eclipse and checking if the **UML Harmony Validator Panel** is available:  
-> Go to **Window ▸ Show View ▸ Other...**, then search for **UML Harmony Validator Panel** in the pop-up dialog.
+> Confirm the installation by going to **Window > Show View > Other...** and searching for **UML Harmony Validator Panel**.
 
-## 🧩 Configuration
-
-1. In Eclipse, open it by navigating to **Window ▸ Show View ▸ Other...**, then searching for **UML Harmony Validator Panel** in the pop-up dialog, double click to add to your workspace.
-   
+## Configuration
+ 
+1. Open the panel by navigating to **Window > Show View > Other...**, then searching for **UML Harmony Validator Panel** and double-clicking to add it to your workspace.
    ![Papyrus show view](images/papyrus_show_view.png)
 
-2. Open the **UML Harmony Validator ▸ Plug-in Settings** menu.
+2. Open **UML Harmony Validator > Plug-in Settings** from the menu.
    ![Plug-in menu](images/plug_in_menu_settings.png)
-
    ![Plug-in settings](images/plug_in_settings.png)
 
-4. Set the **Service URL** to point to the backend validator service, for example:
-   ```
-   http://localhost:8080/kafka
-   ```
-5. Click **Ok**.
+3. Set the **Service URL** to point to the backend validator service, for example:
+```
+   http://localhost:8080/api/analysis
+```
+
+4. Click **Ok**.
 
 > [!TIP]
 > The plug-in stores these settings in Eclipse preferences for persistent use between sessions.
 
-## 🔎 Usage
-
-1. Open any UML project file within your Eclipse workspace.
-   
+## Usage
+ 
+1. Open any UML project in your Eclipse workspace.
    ![Papyrus workspace](images/papyrus_workspace_1.png)
 
-2. Open any UML model (`.uml`).
-   
+2. Open the UML model view (`.uml` file). The analysis works on the active UML view.
    ![UML File](images/papyrus_workspace_2.png)
 
-3. On Plug-in view click on short-cut icon or navigate to:
-  **Menu ▸ Analyze Model**
-   
+3. With the UML model view open, trigger the analysis via the shortcut icon in the plug-in panel or navigate to **Menu > Analyze Model**.
    ![Analyze model action](images/papyrus_workspace_3.png)
 
-4. The plug-in will:
-   * Send the model to the configured backend service.
-   * Retrieve and display inconsistency results in the **Plug-in View**.
-   
+4. The plug-in sends the model to the configured backend service and displays the inconsistency results in the panel once the analysis completes.
    ![Inconsistency results](images/papyrus_workspace_4.png)
 
-5. Navigate between inconsistency results:
-   - Diagram and element boxes are interactive.
-   - Click a **diagram** to display its **elements**, then click an **element** to view its corresponding **inconsistencies**.
-   
+5. Navigate between results — diagram and element boxes are interactive. Click a **diagram** to display its **elements**, then click an **element** to view its **inconsistencies**.
    ![Sequence diagram](images/papyrus_workspace_5.png)
-   
    ![Class diagram](images/papyrus_workspace_6.png)
-
+   
 > [!NOTE]
 > Internet or local network access is required to reach the configured service URL.
 
@@ -152,11 +135,11 @@ This plug-in provides an integrated workflow for model validation within Eclipse
  
 > **CD** = Class Diagram · **SD** = Sequence Diagram · **CR** = Consistency Rule
   
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
-## 🤝 Related Projects
+## Related Projects
 
 * [UML Harmony Validator Service](https://github.com/luanlazz/uml-harmony-validator-service?tab=readme-ov-file#uml-harmony-validator-server---detection-of-inconsistencies) — backend service that performs the UML model analysis.
 
