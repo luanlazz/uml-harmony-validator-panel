@@ -197,7 +197,7 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void setStatus(String message, StatusType type) {
-		Display.getDefault().asyncExec(() -> {
+		Display.getDefault().syncExec(() -> {
 			if (this.statusLabel == null) return;
 			if (this.statusLabel.isDisposed()) return;
 
