@@ -23,22 +23,29 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 import com.plugin.handlers.adapter.ModelSnapshotAdapter;
+import com.plugin.i18n.MessageService;
 import com.plugin.services.InconsistencyAnalyserAPI;
 import com.plugin.services.InconsistencyFetchAPI;
 import com.plugin.services.dto.AnalyserResponseDTO;
 import com.plugin.services.dto.InconsistencyErrorDTO;
 import com.plugin.utils.PluginLogger;
+import com.plugin.utils.ValidationError;
+import com.plugin.validator.ModelAnalyzeValidator;
 import com.plugin.views.InconsistencyPanel;
+import com.plugin.views.StatusType;
 
 public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 	private static final PluginLogger LOGGER = new PluginLogger(AnalyseInconsistenciesHandler.class);
 
 	private InconsistencyAnalyserAPI analyserService = new InconsistencyAnalyserAPI();
+	private MessageService messageService;
 
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
@@ -47,6 +54,14 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) {
+		this.messageService = MessageService.instance();
+
+		List<ValidationError> errorList = ModelAnalyzeValidator.validate();
+		if (!errorList.isEmpty()) {
+			showInformationDialog(this.messageService.get(errorList.get(0).messageCode));
+			return null;
+		}
+
 		List<InconsistencyErrorDTO> inconsistencies = new ArrayList<InconsistencyErrorDTO>();
 
 		try {
@@ -59,11 +74,38 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 			InconsistencyFetchAPI fetchAPI = new InconsistencyFetchAPI(analyseResponse.getClientId(), maxRetries, retryDelayInMS);
 			Display.getDefault().asyncExec(fetchAPI);
+			
+			updateStatus(messageService.get("status.analysis.complete"), StatusType.SUCCESS);
+		} catch (ExecutionException exception) {
+			showInformationDialog(exception.getMessage());
 		} catch (Exception exception) {
 			LOGGER.error("Error analyze the active editor.", exception);
+			updateStatus(messageService.get("status.analysis.failed"), StatusType.ERROR);
 		}
 
 		return inconsistencies;
+	}
+
+	public void updateStatus(String message, StatusType type) {
+		Display.getDefault().asyncExec(() -> {
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IViewPart view = page.findView(InconsistencyPanel.VIEW_ID);
+
+			if (view == null) return;
+
+			((InconsistencyPanel) view).setStatus(message, type);
+		});
+	}
+
+	public void showInformationDialog(String message) {
+		Display.getDefault().asyncExec(() -> {
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IViewPart view = page.findView(InconsistencyPanel.VIEW_ID);
+
+			if (view == null) return;
+
+			((InconsistencyPanel) view).showInformationDialog(message);
+		});
 	}
 
 	private AnalyserResponseDTO analyseActiveEditor() throws Exception {
@@ -172,7 +214,7 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 			if (found != null) return found;
 		}
 
-		throw new ExecutionException("Could not locate a .uml model file. Please open the model (.uml, .di, or .notation).");
+		throw new ExecutionException(messageService.get("info.not.locate.model"));
 	}
 
 	private IFile swapExtension(IFile file, String ext) {
@@ -208,6 +250,6 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		IEditorPart activeEditor = workbenchPart.getSite().getPage().getActiveEditor();
 		if (activeEditor != null) return activeEditor;
 
-		throw new ExecutionException("Open a UML model file first!");
+		throw new ExecutionException(messageService.get("info.open.model"));
 	}
 }
