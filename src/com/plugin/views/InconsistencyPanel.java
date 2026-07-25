@@ -105,6 +105,7 @@ public class InconsistencyPanel extends ViewPart {
 		updateTotalPkgs(0);
 		updateTotalElements(0);
 		updateTotalInconsistencies(0);
+		updateSummary();
 	}
 
 	public void updateViewData(InconsistenciesResponse responseData) {
@@ -168,6 +169,11 @@ public class InconsistencyPanel extends ViewPart {
 			this.summary.setText(messageService.get("summary.model.consistent"));
 		}
 
+		this.summary.pack();
+	}
+	
+	public void updateSummary() {
+		this.summary.setText("");
 		this.summary.pack();
 	}
 
