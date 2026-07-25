@@ -145,7 +145,7 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 		});
 	}
 
-	public void showInformationDialog(String message) {
+	private void showInformationDialog(String message) {
 		Display.getDefault().asyncExec(() -> {
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			IViewPart view = page.findView(InconsistencyPanel.VIEW_ID);
