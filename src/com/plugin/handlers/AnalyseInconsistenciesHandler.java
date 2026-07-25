@@ -45,6 +45,7 @@ import com.plugin.utils.PluginLogger;
 import com.plugin.utils.ValidationError;
 import com.plugin.validator.ModelAnalyzeValidator;
 import com.plugin.views.InconsistencyPanel;
+import com.plugin.views.StatusType;
 
 public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
@@ -86,13 +87,13 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	                    @Override
 	                    public void onResult(InconsistenciesResponse result) {
 	                        Display.getDefault().asyncExec(() -> InconsistencyPanel.instace().updateViewData(result));
-	                        stopLoadingAnimation(messageService.get("status.analysis.complete"), false);
+	                        stopLoadingAnimation(messageService.get("status.analysis.complete"), StatusType.SUCCESS);
 	                    }
 
 	                    @Override
 	                    public void onError(Exception exception) {
 	                        LOGGER.error("SSE error", exception);
-	                        stopLoadingAnimation(messageService.get("status.analysis.failed"), true);
+	                        stopLoadingAnimation(messageService.get("status.analysis.failed"), StatusType.ERROR);
 	                    }
 	                });
 
@@ -105,7 +106,7 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 			showInformationDialog(exception.getMessage());
 		} catch (Exception exception) {
 			LOGGER.error("Error analyze the active editor.", exception);
-			stopLoadingAnimation(messageService.get("status.analysis.failed"), true);
+			stopLoadingAnimation(messageService.get("status.analysis.failed"), StatusType.ERROR);
 		}
 
 		return null;
@@ -123,25 +124,25 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	    		
 	        dotCount[0] = (dotCount[0] % 3) + 1;
 	        String text = "Analisando" + ".".repeat(dotCount[0]);
-	        if (this.animating.get()) updateStatus(text, false);
+	        if (this.animating.get()) updateStatus(text, StatusType.INFO);
 	    }, 0, 500, TimeUnit.MILLISECONDS);
 	}
 	
-	private void stopLoadingAnimation(String finalMessage, boolean isError) {
+	private void stopLoadingAnimation(String finalMessage, StatusType type) {
 		this.animating.set(false);
 	    if (this.dotAnimator != null) this.dotAnimator.shutdownNow();
 
-	    updateStatus(finalMessage, isError);
+	    updateStatus(finalMessage, type);
 	}
 	
-	public void updateStatus(String message, boolean isError) {
+	public void updateStatus(String message, StatusType type) {
 		Display.getDefault().syncExec(() -> {
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			IViewPart view = page.findView(InconsistencyPanel.VIEW_ID);
 
 			if (view == null) return;
 
-			((InconsistencyPanel) view).setStatus(message, isError);
+			((InconsistencyPanel) view).setStatus(message, type);
 		});
 	}
 

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
@@ -104,6 +105,7 @@ public class InconsistencyPanel extends ViewPart {
 		updateTotalPkgs(0);
 		updateTotalElements(0);
 		updateTotalInconsistencies(0);
+		updateSummary();
 	}
 
 	public void updateViewData(InconsistenciesResponse responseData) {
@@ -169,6 +171,11 @@ public class InconsistencyPanel extends ViewPart {
 
 		this.summary.pack();
 	}
+	
+	public void updateSummary() {
+		this.summary.setText("");
+		this.summary.pack();
+	}
 
 	public long countInconsistenciesBySeverity(List<InconsistencyErrorDTO> inconsistencies, Severity severity) {
 		if (inconsistencies == null) return 0;
@@ -189,15 +196,19 @@ public class InconsistencyPanel extends ViewPart {
 		}
 	}
 
-	public void setStatus(String message, boolean isError) {
+	public void setStatus(String message, StatusType type) {
 		Display.getDefault().syncExec(() -> {
 			if (this.statusLabel == null) return;
 			if (this.statusLabel.isDisposed()) return;
 
+			Color color = switch (type) {
+	        	case SUCCESS -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN);
+	        	case INFO -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
+	        	case ERROR -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
+			};
+			
+			this.statusLabel.setForeground(color);
 			this.statusLabel.setText(message);
-
-			int messageColor = isError ? SWT.COLOR_RED : SWT.COLOR_DARK_GREEN;
-			this.statusLabel.setForeground(statusLabel.getDisplay().getSystemColor(messageColor));
 		});
 	}
 
