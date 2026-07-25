@@ -1,12 +1,15 @@
 package com.plugin.services;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -18,7 +21,7 @@ import org.eclipse.core.resources.IFile;
 import com.plugin.exceptions.AnalyserException;
 import com.plugin.i18n.MessageService;
 import com.plugin.services.dto.AnalyserResponseDTO;
-import com.plugin.services.dto.InconsistenciesResponseDTO;
+import com.plugin.services.dto.InconsistenciesResponse;
 import com.plugin.utils.Json2Obj;
 import com.plugin.utils.PluginLogger;
 
@@ -88,26 +91,35 @@ public class InconsistencyAnalyserAPI {
         }
     }
 
-	public InconsistenciesResponseDTO getInconsistenciesByClientId(String clientId) throws AnalyserException {
+	public void streamInconsistencies(String clientId, SSEResultCallback callback) {
 	    String urlBase = getUrlBase();
-	    if (urlBase == null || urlBase.isBlank()) throw new AnalyserException(this.messageService.get("validation.service.url.not.configured"));
+	    if (urlBase == null || urlBase.isBlank()) {
+	        callback.onError(new AnalyserException(this.messageService.get("validation.service.url.not.configured")));
+	        return;
+	    }
 
-	    String url = urlBase + "/" + clientId;
-	    HttpGet request = new HttpGet(url);
-	    request.setHeader("Accept-Language", messageService.getLocale().toString());
+	    try {
+	        URL url = new URL(urlBase + "/stream/" + clientId);
+	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	        conn.setConnectTimeout(5000);
+	        conn.addRequestProperty("Accept-Language", messageService.getLocale().toString());
 
-	    try (CloseableHttpClient client = HttpClients.createDefault();
-	         CloseableHttpResponse resp = client.execute(request)) {
-
-	        int statusCode = resp.getStatusLine().getStatusCode();
-	        String body = EntityUtils.toString(resp.getEntity(), "UTF-8");
-
-	        if (statusCode < 200 || statusCode > 299) throw new AnalyserException("Server returned HTTP " + statusCode + ": " + body);
-
-	        return Json2Obj.deserializeObj(body, InconsistenciesResponseDTO.class);
-	    } catch (IOException exception) {
-	        LOGGER.error("HTTP GET request to [" + url + "] failed.", exception);
-	        throw new AnalyserException("HTTP GET request to [" + url + "] failed.", exception);
+	        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+	            String line;
+	            while ((line = reader.readLine()) != null) {
+	                if (line.startsWith("data:")) {
+	                    String json = line.substring(5).trim();
+	                    InconsistenciesResponse result = Json2Obj.deserializeObj(json, InconsistenciesResponse.class);
+	                    callback.onResult(result);
+	                    break;
+	                }
+	            }
+	        } finally {
+	            conn.disconnect();
+	        }
+	    } catch (Exception exception) {
+	        LOGGER.error("SSE streaming error for clientId: " + clientId, exception);
+	        callback.onError(exception);
 	    }
 	}
 }

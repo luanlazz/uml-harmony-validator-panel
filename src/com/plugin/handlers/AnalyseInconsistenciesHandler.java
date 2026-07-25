@@ -2,9 +2,12 @@ package com.plugin.handlers;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -14,6 +17,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -31,9 +38,9 @@ import org.eclipse.ui.PlatformUI;
 import com.plugin.handlers.adapter.ModelSnapshotAdapter;
 import com.plugin.i18n.MessageService;
 import com.plugin.services.InconsistencyAnalyserAPI;
-import com.plugin.services.InconsistencyFetchAPI;
+import com.plugin.services.SSEResultCallback;
 import com.plugin.services.dto.AnalyserResponseDTO;
-import com.plugin.services.dto.InconsistencyErrorDTO;
+import com.plugin.services.dto.InconsistenciesResponse;
 import com.plugin.utils.PluginLogger;
 import com.plugin.utils.ValidationError;
 import com.plugin.validator.ModelAnalyzeValidator;
@@ -45,7 +52,9 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 	private InconsistencyAnalyserAPI analyserService = new InconsistencyAnalyserAPI();
 	private MessageService messageService;
-
+	private ScheduledExecutorService dotAnimator;
+	private final AtomicBoolean animating = new AtomicBoolean(false);
+	
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
 		// TODO Auto-generated method stub
@@ -55,38 +64,78 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) {
 		this.messageService = MessageService.instance();
 
+		InconsistencyPanel.instace().clearTables();
+
 		List<ValidationError> errorList = ModelAnalyzeValidator.validate();
 		if (!errorList.isEmpty()) {
 			showInformationDialog(this.messageService.get(errorList.get(0).messageCode));
 			return null;
 		}
 
-		List<InconsistencyErrorDTO> inconsistencies = new ArrayList<InconsistencyErrorDTO>();
-
 		try {
-			InconsistencyPanel.instace().clearTables();
-
 			AnalyserResponseDTO analyseResponse = analyseActiveEditor();
+	        if (!analyseResponse.getSuccess()) throw new Exception(messageService.get("status.analysis.failed"));
 
-			int maxRetries = 12;
-			long retryDelayInMS = 100;
+		    startLoadingAnimation();
+	        String clientId = analyseResponse.getClientId();
 
-			InconsistencyFetchAPI fetchAPI = new InconsistencyFetchAPI(analyseResponse.getClientId(), maxRetries, retryDelayInMS);
-			Display.getDefault().asyncExec(fetchAPI);
-			
-			updateStatus(messageService.get("status.analysis.complete"), true);
+	        Job streamJob = new Job("Listening for analysis results...") {
+	            @Override
+	            protected IStatus run(IProgressMonitor monitor) {
+	                analyserService.streamInconsistencies(clientId, new SSEResultCallback() {
+	                    @Override
+	                    public void onResult(InconsistenciesResponse result) {
+	                        Display.getDefault().asyncExec(() -> InconsistencyPanel.instace().updateViewData(result));
+	                        stopLoadingAnimation(messageService.get("status.analysis.complete"), false);
+	                    }
+
+	                    @Override
+	                    public void onError(Exception exception) {
+	                        LOGGER.error("SSE error", exception);
+	                        stopLoadingAnimation(messageService.get("status.analysis.failed"), true);
+	                    }
+	                });
+
+	                return Status.OK_STATUS;
+	            }
+	        };
+	        
+	        streamJob.schedule();
 		} catch (ExecutionException exception) {
 			showInformationDialog(exception.getMessage());
 		} catch (Exception exception) {
 			LOGGER.error("Error analyze the active editor.", exception);
-			updateStatus(messageService.get("status.analysis.failed"), true);
+			stopLoadingAnimation(messageService.get("status.analysis.failed"), true);
 		}
 
-		return inconsistencies;
+		return null;
 	}
 
+	private void startLoadingAnimation() {
+		this.animating.set(true);
+		
+	    int[] dotCount = {0};
+	    
+	    this.dotAnimator = Executors.newSingleThreadScheduledExecutor();
+	    
+	    this.dotAnimator.scheduleAtFixedRate(() -> {
+	    	if (!this.animating.get()) return;
+	    		
+	        dotCount[0] = (dotCount[0] % 3) + 1;
+	        String text = "Analisando" + ".".repeat(dotCount[0]);
+	        if (this.animating.get()) updateStatus(text, false);
+	    }, 0, 500, TimeUnit.MILLISECONDS);
+	}
+	
+	private void stopLoadingAnimation(String finalMessage, boolean isError) {
+		this.animating.set(false);
+	    if (this.dotAnimator != null) this.dotAnimator.shutdownNow();
+
+	    updateStatus(finalMessage, isError);
+	}
+	
 	public void updateStatus(String message, boolean isError) {
-		Display.getDefault().asyncExec(() -> {
+		Display.getDefault().syncExec(() -> {
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			IViewPart view = page.findView(InconsistencyPanel.VIEW_ID);
 
