@@ -64,15 +64,9 @@ public class InconsistencyAnalyserAPI {
         String url = getUrlBase();
         if (url == null || url.isBlank()) throw new AnalyserException(this.messageService.get("validation.service.url.not.configured"));
 
-        HttpEntity multipart = MultipartEntityBuilder.create()
-                .addBinaryBody(
-                        "file",
-                        modelBytes,
-                        UML_CONTENT_TYPE,
-                        filename)
-                .build();
+        HttpEntity multipart = MultipartEntityBuilder.create().addBinaryBody("file", modelBytes, UML_CONTENT_TYPE, filename).build();
 
-        HttpPost request = new HttpPost(url);
+        HttpPost request = new HttpPost(url + "/model");
         request.setEntity(multipart);
         request.setHeader("Accept-Language", messageService.getLocale().toString());
 
