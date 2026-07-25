@@ -123,7 +123,7 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	    	if (!this.animating.get()) return;
 	    		
 	        dotCount[0] = (dotCount[0] % 3) + 1;
-	        String text = "Analisando" + ".".repeat(dotCount[0]);
+	        String text = messageService.get("status.analysis.loading") + ".".repeat(dotCount[0]);
 	        if (this.animating.get()) updateStatus(text, StatusType.INFO);
 	    }, 0, 500, TimeUnit.MILLISECONDS);
 	}
