@@ -8,12 +8,12 @@
             class="com.plugin.views.InconsistencyPanel"
             icon="icons/anomaly_blue.png"
             id="com.inconsistency.InconsistencyAnalyser"
-            name="UML Harmony Validator Panel"
+            name="UML Harmony Validator"
             restorable="true">
       </view>
       <category
             id="com.inconsistency.category.uml.inconsistency"
-            name="UML Harmony Validator">
+            name="UML Validator">
       </category>
    </extension>
    <extension
