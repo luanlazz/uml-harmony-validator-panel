@@ -6,7 +6,7 @@
       <view
             category="com.inconsistency.category.uml.inconsistency"
             class="com.plugin.views.InconsistencyPanel"
-            icon="icons/anomaly_blue.png"
+            icon="icons/uml_harmony_validator_icon.png"
             id="com.inconsistency.InconsistencyAnalyser"
             name="UML Harmony Validator"
             restorable="true">
