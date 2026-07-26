@@ -1,4 +1,4 @@
-<img width="1055" height="323" alt="image" src="https://github.com/user-attachments/assets/e0861ca1-b758-418a-8e33-65eaafe0a0b0" />
+<img width="1774" height="887" alt="ChatGPT Image 25 de jul  de 2026, 23_25_24" src="https://github.com/user-attachments/assets/a0f42b5e-e785-4120-a894-50b506341f16" />
 
 # UML Harmony Validator – Eclipse Plug-in
 
