@@ -1,3 +1,5 @@
+<img width="1055" height="323" alt="image" src="https://github.com/user-attachments/assets/e0861ca1-b758-418a-8e33-65eaafe0a0b0" />
+
 # UML Harmony Validator – Eclipse Plug-in
 
 The **UML Harmony Validator Plug-in** extends the **Eclipse Modeling Framework (EMF)**, allowing users to **analyze UML models** directly from the Eclipse IDE.
