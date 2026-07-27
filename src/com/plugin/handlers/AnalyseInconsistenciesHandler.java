@@ -89,6 +89,7 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	                    public void onError(Exception exception) {
 	                        LOGGER.error("SSE error", exception);
 	                        Display.getDefault().asyncExec(() ->
+                            InconsistencyPanel.instace().showError(messageService.get("status.analysis.failed")));
 	                    }
 	                });
 
@@ -103,6 +104,7 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 			showInformationDialog(exception.getMessage());
 		} catch (Exception exception) {
 			LOGGER.error("Error analyze the active editor.", exception);
+			InconsistencyPanel.instace().showError(messageService.get("status.analysis.failed"));
 		}
 
 		return null;
