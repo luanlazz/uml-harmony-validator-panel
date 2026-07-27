@@ -72,25 +72,32 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 	        String clientId = analyseResponse.getClientId();
 
-	        Job streamJob = new Job("Listening for analysis results...") {
+	        Job streamJob = new Job(messageService.get("status.analysis.loading")) {
 	            @Override
 	            protected IStatus run(IProgressMonitor monitor) {
+	                monitor.beginTask(messageService.get("status.analysis.loading"), IProgressMonitor.UNKNOWN);
+	                monitor.subTask(messageService.get("status.analysis.waiting"));
+	            	
 	                analyserService.streamInconsistencies(clientId, new SSEResultCallback() {
 	                    @Override
 	                    public void onResult(InconsistenciesResponse result) {
+	                        monitor.subTask(messageService.get("status.analysis.applying"));
 	                        Display.getDefault().asyncExec(() -> InconsistencyPanel.instace().updateViewData(result));
 	                    }
 
 	                    @Override
 	                    public void onError(Exception exception) {
 	                        LOGGER.error("SSE error", exception);
+	                        Display.getDefault().asyncExec(() ->
 	                    }
 	                });
 
+	                monitor.done();
 	                return Status.OK_STATUS;
 	            }
 	        };
 	        
+	        streamJob.setUser(true);
 	        streamJob.schedule();
 		} catch (ExecutionException exception) {
 			showInformationDialog(exception.getMessage());
