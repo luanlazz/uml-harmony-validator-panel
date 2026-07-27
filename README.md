@@ -14,6 +14,8 @@ It connects to a remote validation [service](https://github.com/luanlazz/uml-har
     - [Option 2 – Build from Source (manual)](#option-2--build-from-source-manual)
   - [Configuration](#configuration)
   - [Usage](#usage)
+    - [Analyzing a model](#analyzing-a-model)
+    - [Consistent model](#consistent-model)
   - [Supported Inconsistency Types](#supported-inconsistency-types)
   - [License](#license)
   - [Related Projects](#related-projects)
@@ -102,6 +104,8 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 
 ## Usage
 
+### Analyzing a model
+
 1. Open your UML project (1) in the Eclipse workspace and navigate to the UML model view. In the plug-in (2), trigger the analysis (3) via the shortcut icon or navigate to **Menu > Analyze Model**.
 
    ![Analyze model](images/use_1.png)
@@ -114,12 +118,14 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 
    ![Navigate](images/use_3.png)
 
-4. When the **model has no inconsistencies**, the panel is cleared automatically.
-
-   ![Consistent](images/use_4.png)
-
 > [!NOTE]
 > Internet or local network access is required to reach the configured service URL.
+
+### Consistent model
+
+When the **model has no inconsistencies**, the panel is cleared automatically.
+
+   ![Consistent](images/use_4_consistent.png)
 
 ## Supported Inconsistency Types
  
