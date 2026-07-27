@@ -1,4 +1,4 @@
-![UML Harmony Validato Logo](images/uml_harmony_validator_logo.png)
+![UML Harmony Validator Logo](images/uml_harmony_validator_logo.png)
 
 # UML Harmony Validator – Eclipse Plug-in
 
@@ -15,6 +15,7 @@ It connects to a remote validation [service](https://github.com/luanlazz/uml-har
   - [Configuration](#configuration)
   - [Usage](#usage)
     - [Analyzing a model](#analyzing-a-model)
+    - [Interactive navigation](#interactive-navigation)
     - [Consistent model](#consistent-model)
     - [Analysis error](#analysis-error)
     - [Misconfigured service URL](#misconfigured-service-url)
@@ -34,14 +35,14 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 > The plug-in communicates with the [UML Harmony Validator Service](https://github.com/luanlazz/uml-harmony-validator-service?tab=readme-ov-file#uml-harmony-validator-server---detection-of-inconsistencies) to perform the actual analysis.
 
 ## Features
- 
+
 * Validate UML models (Class and Sequence Diagrams) directly within Eclipse.
 * Detect multiple types of inconsistencies, described in [Supported Inconsistency Types](#supported-inconsistency-types).
 * Configure service endpoint through the settings dialog.
 * Lightweight integration with existing EMF-based projects.
 
 ## Architecture
- 
+
 * **Platform:** Eclipse (EMF-based plug-in)
 * **Backend Communication:** REST API with SSE (Server-Sent Events) for real-time result delivery
 * **Core Technologies:**
@@ -60,14 +61,13 @@ This plug-in provides an integrated workflow for model validation within Eclipse
    > If the `dropins/` folder does not exist, create it in the Eclipse root directory.
 4. Open/Restart Eclipse IDE. The plug-in should load automatically.
 
-
 ### Option 2 – Build from Source (manual)
- 
+
 1. Clone this repository:
-```bash
+   ```bash
    gh repo clone luanlazz/uml-harmony-validator-plugin
    cd uml-harmony-validator-plugin
-```
+   ```
 2. Open **Eclipse IDE for RCP and RAP Developers**.
 3. Go to **File > Import > Existing Projects into Workspace**, and select the cloned folder.
 4. Once imported, open the **plugin.xml** file to verify that dependencies are resolved.
@@ -81,25 +81,34 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 7. Open/Restart Eclipse to activate the plug-in.
 
 > [!TIP]
-> Confirm the installation by going to **Window > Show View > Other...** and searching for **UML Harmony Validator Panel**.
+> Confirm the installation by going to **Window > Show View > Other...** and searching for **UML Harmony Validator**.
 
 ## Configuration
- 
-1. Open the panel by navigating to **Window > Show View > Other...**, then searching for **UML Harmony Validator Panel** and double-clicking to add it to your workspace.
-  
-  ![Papyrus show view](images/papyrus_show_view.png)
 
-2. Open **UML Harmony Validator > Plug-in Settings** from the menu.
-  
-  ![Plug-in menu](images/plug_in_menu_settings.png)
-  ![Plug-in settings](images/plug_in_settings.png)
+### 1. Open the view
 
-3. Set the **Service URL** to point to the backend validator service, for example:
+Navigate to **Window > Show View > Other...**, search for **UML Harmony Validator** and double-click to add it to your workspace.
+
+![Papyrus show view](images/papyrus_show_view.png)
+
+> [Watch: workspace configuration](https://youtu.be/3vU5-6fLZmY?si=Wl02ldQbCjpg131g)
+
+### 2. Set the service endpoint
+
+Open **UML Harmony Validator > Settings** from the menu.
+
+![Plug-in menu](images/plug_in_menu_settings.png)
+![Plug-in settings](images/plug_in_settings.png)
+
+Set the **Service URL** to point to the backend validator service, for example:
+
 ```
-   http://localhost:8080/api/analysis
+http://localhost:8080/api/analysis
 ```
 
-4. Click **Ok**.
+Click **Ok**.
+
+> [Watch: service endpoint configuration](https://youtu.be/Dzq-2SdA74o?si=mgK7IfTIYMAKrGR-)
 
 > [!TIP]
 > The plug-in stores these settings in Eclipse preferences for persistent use between sessions.
@@ -116,34 +125,49 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 
    ![Analysis result](images/use_2.png)
 
-3. The panel is interactive, click a **diagram** (1) to list its **elements**, then click an **element** (2) to view its **inconsistencies** (3).
-
-   ![Navigate](images/use_3.png)
+> [Watch: model analysis](https://youtu.be/kkCC66XxMjk?si=-a3Ja96kagULxO6K)
 
 > [!NOTE]
 > Internet or local network access is required to reach the configured service URL.
+
+### Interactive navigation
+
+The panel is interactive — click a **diagram** (1) to list its **elements**, then click an **element** (2) to view its **inconsistencies** (3).
+
+![Navigate](images/use_3.png)
+
+> [Watch: interactive navigation](https://youtu.be/XIjRyH1K0yU?si=VZspipRy_Tlkr1ib)
 
 ### Consistent model
 
 When the **model has no inconsistencies**, the panel is cleared automatically.
 
-   ![Consistent](images/use_4_consistent.png)
+![Consistent](images/use_4_consistent.png)
+
+> [Watch: consistent model](https://youtu.be/Q-ZNgX6B7oE?si=w3vEEk3mmOEdcRuF)
 
 ### Analysis error
 
-If the analysis fails, for example, a network issue. An error status is displayed in the panel. No results are shown.
+If the analysis fails — for example, due to a network issue — an error message is displayed in the summary area. No results are shown.
 
-   ![Error](images/use_5_error.png)
+![Error](images/use_5_error.png)
+
+> [Watch: unknown request error](https://youtu.be/O7Pnkb44N8I?si=5_Logg2IHxU3LCnu)
 
 ### Misconfigured service URL
 
-   ![Misconfigured](images/error_config.png)
+If the service URL is not configured or invalid, the plug-in will show a validation message before attempting the analysis.
+
+![Misconfigured](images/error_config.png)
+
+> [Watch: validation for misconfiguration](https://youtu.be/mencVORZEZs?si=aBMfbeslT6eCWL0o)  
+> [Watch: validation when there is no model](https://youtu.be/2z-Jtt_57Qo?si=L81-nvQBm6z8uWfh)
 
 > [!TIP]
-> Check the service URL under **Menu > Plug-in Settings** and ensure the backend service is running and reachable.
+> Check the service URL under **Menu > Settings** and ensure the backend service is running and reachable.
 
 ## Supported Inconsistency Types
- 
+
 | Code | Name / Description | Formal Definition | CR | Diagrams |
 | ---- | ------------------ | ----------------- | -- | -------- |
 | **Cm** | **Class Multiplicity**<br>Multiple definitions of classes with the same name. | `IF not classUniqueName THEN Cm inconsistency` | UML | CD |
@@ -158,9 +182,9 @@ If the analysis fails, for example, a network issue. An error status is displaye
 | **CnoM** | **Class without Methods**<br>Class without any defined methods. | `IF not classHasMethod THEN CnoM inconsistency` | UML | CD |
 | **OnN** | **Object without Name**<br>Object without a name. | `IF not objectName THEN OnN inconsistency` | UML | SD |
 | **EpM** | **Element with Private Method**<br>Message calling a private method in the Class Diagram. | `IF not R116 THEN EpM inconsistency` | R116 | SD, CD |
- 
+
 > **CD** = Class Diagram · **SD** = Sequence Diagram · **CR** = Consistency Rule
-  
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
@@ -168,4 +192,3 @@ This project is licensed under the [MIT License](LICENSE).
 ## Related Projects
 
 * [UML Harmony Validator Service](https://github.com/luanlazz/uml-harmony-validator-service?tab=readme-ov-file#uml-harmony-validator-server---detection-of-inconsistencies) — backend service that performs the UML model analysis.
-
