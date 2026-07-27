@@ -4,10 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -45,7 +41,6 @@ import com.plugin.utils.PluginLogger;
 import com.plugin.utils.ValidationError;
 import com.plugin.validator.ModelAnalyzeValidator;
 import com.plugin.views.InconsistencyPanel;
-import com.plugin.views.StatusType;
 
 public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
@@ -53,8 +48,6 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 
 	private InconsistencyAnalyserAPI analyserService = new InconsistencyAnalyserAPI();
 	private MessageService messageService;
-	private ScheduledExecutorService dotAnimator;
-	private final AtomicBoolean animating = new AtomicBoolean(false);
 	
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
@@ -77,7 +70,6 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 			AnalyserResponseDTO analyseResponse = analyseActiveEditor();
 	        if (!analyseResponse.getSuccess()) throw new Exception(messageService.get("status.analysis.failed"));
 
-		    startLoadingAnimation();
 	        String clientId = analyseResponse.getClientId();
 
 	        Job streamJob = new Job("Listening for analysis results...") {
@@ -87,13 +79,11 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 	                    @Override
 	                    public void onResult(InconsistenciesResponse result) {
 	                        Display.getDefault().asyncExec(() -> InconsistencyPanel.instace().updateViewData(result));
-	                        stopLoadingAnimation(messageService.get("status.analysis.complete"), StatusType.SUCCESS);
 	                    }
 
 	                    @Override
 	                    public void onError(Exception exception) {
 	                        LOGGER.error("SSE error", exception);
-	                        stopLoadingAnimation(messageService.get("status.analysis.failed"), StatusType.ERROR);
 	                    }
 	                });
 
@@ -106,44 +96,9 @@ public class AnalyseInconsistenciesHandler extends AbstractHandler {
 			showInformationDialog(exception.getMessage());
 		} catch (Exception exception) {
 			LOGGER.error("Error analyze the active editor.", exception);
-			stopLoadingAnimation(messageService.get("status.analysis.failed"), StatusType.ERROR);
 		}
 
 		return null;
-	}
-
-	private void startLoadingAnimation() {
-		this.animating.set(true);
-		
-	    int[] dotCount = {0};
-	    
-	    this.dotAnimator = Executors.newSingleThreadScheduledExecutor();
-	    
-	    this.dotAnimator.scheduleAtFixedRate(() -> {
-	    	if (!this.animating.get()) return;
-	    		
-	        dotCount[0] = (dotCount[0] % 3) + 1;
-	        String text = messageService.get("status.analysis.loading") + ".".repeat(dotCount[0]);
-	        if (this.animating.get()) updateStatus(text, StatusType.INFO);
-	    }, 0, 500, TimeUnit.MILLISECONDS);
-	}
-	
-	private void stopLoadingAnimation(String finalMessage, StatusType type) {
-		this.animating.set(false);
-	    if (this.dotAnimator != null) this.dotAnimator.shutdownNow();
-
-	    updateStatus(finalMessage, type);
-	}
-	
-	public void updateStatus(String message, StatusType type) {
-		Display.getDefault().syncExec(() -> {
-			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			IViewPart view = page.findView(InconsistencyPanel.VIEW_ID);
-
-			if (view == null) return;
-
-			((InconsistencyPanel) view).setStatus(message, type);
-		});
 	}
 
 	private void showInformationDialog(String message) {
