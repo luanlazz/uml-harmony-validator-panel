@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.file.Files;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -64,10 +65,17 @@ public class InconsistencyAnalyserAPI {
         String url = getUrlBase();
         if (url == null || url.isBlank()) throw new AnalyserException(this.messageService.get("validation.service.url.not.configured"));
 
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(5000)
+                .setConnectionRequestTimeout(5000)
+                .setSocketTimeout(10000)
+                .build();
+        
         HttpEntity multipart = MultipartEntityBuilder.create().addBinaryBody("file", modelBytes, UML_CONTENT_TYPE, filename).build();
 
         HttpPost request = new HttpPost(url + "/model");
         request.setEntity(multipart);
+        request.setConfig(requestConfig);
         request.setHeader("Accept-Language", messageService.getLocale().toString());
 
         try (CloseableHttpClient client = HttpClients.createDefault();
