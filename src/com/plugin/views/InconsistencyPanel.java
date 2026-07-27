@@ -99,7 +99,7 @@ public class InconsistencyPanel extends ViewPart {
 		updateTotalPkgs(0);
 		updateTotalElements(0);
 		updateTotalInconsistencies(0);
-		updateSummary();
+		clearSummary();
 	}
 
 	public void updateViewData(InconsistenciesResponse responseData) {
@@ -157,6 +157,8 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void updateSummary(int num) {
+		this.summary.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+		
 		if (num > 0) {
 			this.summary.setText(String.format(messageService.get("summary.model.inconsistent"), num));
 		} else {
@@ -166,7 +168,8 @@ public class InconsistencyPanel extends ViewPart {
 		this.summary.pack();
 	}
 	
-	public void updateSummary() {
+	public void clearSummary() {
+		this.summary.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		this.summary.setText("");
 		this.summary.pack();
 	}
@@ -188,14 +191,24 @@ public class InconsistencyPanel extends ViewPart {
 			System.out.println("Error to load resource: " + fileName + " - error: " + e.getMessage());
 			return null;
 		}
-	}
+	}	
 	
 	public void showInformationDialog(String message) {
 		Display.getDefault().asyncExec(() -> {		    
 		    MessageDialog.openInformation(Display.getDefault().getActiveShell(), "UML Harmony Validator", message);
 		});		
 	}
+	
+	public void showError(String message) {		
+		clearTables();
+        this.summary.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED));
+        this.summary.setText(message);
+		this.summary.pack();
+	}
 
+	@Override
+	public void setFocus() { }
+	
 	private void setupSummaryLabel(Composite parent, Display display) {
 		this.summary = new Label(parent, SWT.NONE);
 		GridData gridSummary = new GridData(SWT.FILL, SWT.CENTER, true, false, GRID_COLS, 1);
