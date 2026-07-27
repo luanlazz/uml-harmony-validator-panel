@@ -17,6 +17,7 @@ It connects to a remote validation [service](https://github.com/luanlazz/uml-har
     - [Analyzing a model](#analyzing-a-model)
     - [Consistent model](#consistent-model)
     - [Analysis error](#analysis-error)
+    - [Misconfigured service URL](#misconfigured-service-url)
   - [Supported Inconsistency Types](#supported-inconsistency-types)
   - [License](#license)
   - [Related Projects](#related-projects)
@@ -133,6 +134,13 @@ When the **model has no inconsistencies**, the panel is cleared automatically.
 If the analysis fails, for example, a network issue. An error status is displayed in the panel. No results are shown.
 
    ![Error](images/use_5_error.png)
+
+### Misconfigured service URL
+
+   ![Misconfigured](images/error_config.png)
+
+> [!TIP]
+> Check the service URL under **Menu > Plug-in Settings** and ensure the backend service is running and reachable.
 
 ## Supported Inconsistency Types
  
