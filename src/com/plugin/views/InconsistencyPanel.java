@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
@@ -35,7 +34,6 @@ public class InconsistencyPanel extends ViewPart {
 
 	private static int SUMMARY_LABEL_FONT_SIZE = 20;
 	private static int TABLE_TITLE_FONT_SIZE = 16;
-	private static int STATUS_LABEL_FONT_SIZE = 14;
 
 	private static int DIAGRAM_TABLE_COLS = 3;
 	private static int ELEMENT_TABLE_COLS = 2;
@@ -59,8 +57,6 @@ public class InconsistencyPanel extends ViewPart {
 	private Label labelTotalPkgs = null;
 	private Label labelTotalElements = null;
 	private Label labelTotalInconsistencies = null;
-
-	private Label statusLabel;
 
 	public InconsistencyPanel() {
 		single_instance = this;
@@ -93,8 +89,6 @@ public class InconsistencyPanel extends ViewPart {
 		setupDiagramTableFooter(parent);
 		setupElementTableFooter(parent);
 		setupInconsistencyTableFooter(parent);
-
-		setupStatusLabel(parent, display);
 	}
 
 	public void clearTables() {
@@ -105,7 +99,7 @@ public class InconsistencyPanel extends ViewPart {
 		updateTotalPkgs(0);
 		updateTotalElements(0);
 		updateTotalInconsistencies(0);
-		updateSummary();
+		clearSummary();
 	}
 
 	public void updateViewData(InconsistenciesResponse responseData) {
@@ -163,6 +157,8 @@ public class InconsistencyPanel extends ViewPart {
 	}
 
 	public void updateSummary(int num) {
+		this.summary.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+		
 		if (num > 0) {
 			this.summary.setText(String.format(messageService.get("summary.model.inconsistent"), num));
 		} else {
@@ -172,7 +168,8 @@ public class InconsistencyPanel extends ViewPart {
 		this.summary.pack();
 	}
 	
-	public void updateSummary() {
+	public void clearSummary() {
+		this.summary.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		this.summary.setText("");
 		this.summary.pack();
 	}
@@ -194,35 +191,24 @@ public class InconsistencyPanel extends ViewPart {
 			System.out.println("Error to load resource: " + fileName + " - error: " + e.getMessage());
 			return null;
 		}
-	}
-
-	public void setStatus(String message, StatusType type) {
-		Display.getDefault().syncExec(() -> {
-			if (this.statusLabel == null) return;
-			if (this.statusLabel.isDisposed()) return;
-
-			Color color = switch (type) {
-	        	case SUCCESS -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN);
-	        	case INFO -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
-	        	case ERROR -> Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
-			};
-			
-			this.statusLabel.setForeground(color);
-			this.statusLabel.setText(message);
-		});
-	}
-
-	@Override
-	public void setFocus() {
-		this.statusLabel.setFocus();
-	}
+	}	
 	
 	public void showInformationDialog(String message) {
 		Display.getDefault().asyncExec(() -> {		    
 		    MessageDialog.openInformation(Display.getDefault().getActiveShell(), "UML Harmony Validator", message);
 		});		
 	}
+	
+	public void showError(String message) {		
+		clearTables();
+        this.summary.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED));
+        this.summary.setText(message);
+		this.summary.pack();
+	}
 
+	@Override
+	public void setFocus() { }
+	
 	private void setupSummaryLabel(Composite parent, Display display) {
 		this.summary = new Label(parent, SWT.NONE);
 		GridData gridSummary = new GridData(SWT.FILL, SWT.CENTER, true, false, GRID_COLS, 1);
@@ -282,15 +268,5 @@ public class InconsistencyPanel extends ViewPart {
 		GridData gridTotalInconsistencies = new GridData(SWT.FILL, SWT.FILL, true, true, INCONSISTENCY_TABLE_COLS, 1);
 		this.labelTotalInconsistencies.setLayoutData(gridTotalInconsistencies);
 		this.updateTotalInconsistencies(0);
-	}
-
-	private void setupStatusLabel(Composite parent, Display display) {
-		this.statusLabel = new Label(parent, SWT.NONE);
-		GridData gridStatusLabel = new GridData(SWT.FILL, SWT.CENTER, true, false, GRID_COLS, 1);
-		this.statusLabel.setLayoutData(gridStatusLabel);
-		FontData[] fD = this.statusLabel.getFont().getFontData();
-		fD[0].setHeight(STATUS_LABEL_FONT_SIZE);
-		this.statusLabel.setFont(new Font(display, fD[0]));
-		this.statusLabel.setText("");
 	}
 }
