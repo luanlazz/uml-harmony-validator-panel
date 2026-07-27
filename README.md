@@ -16,6 +16,7 @@ It connects to a remote validation [service](https://github.com/luanlazz/uml-har
   - [Usage](#usage)
     - [Analyzing a model](#analyzing-a-model)
     - [Consistent model](#consistent-model)
+    - [Analysis error](#analysis-error)
   - [Supported Inconsistency Types](#supported-inconsistency-types)
   - [License](#license)
   - [Related Projects](#related-projects)
@@ -126,6 +127,12 @@ This plug-in provides an integrated workflow for model validation within Eclipse
 When the **model has no inconsistencies**, the panel is cleared automatically.
 
    ![Consistent](images/use_4_consistent.png)
+
+### Analysis error
+
+If the analysis fails, for example, a network issue. An error status is displayed in the panel. No results are shown.
+
+   ![Error](images/use_5_error.png)
 
 ## Supported Inconsistency Types
  
